@@ -14,7 +14,119 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      leads: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          message: string
+          name: string
+          phone: string
+          property_id: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          message: string
+          name: string
+          phone: string
+          property_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          message?: string
+          name?: string
+          phone?: string
+          property_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "leads_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      properties: {
+        Row: {
+          address: string
+          area: number
+          bathrooms: number
+          bedrooms: number
+          city: string
+          created_at: string
+          description: string
+          featured: boolean | null
+          features: string[] | null
+          id: string
+          images: string[] | null
+          lat: number
+          listing_type: string
+          lng: number
+          parking: number | null
+          price: number
+          state: string
+          title: string
+          type: string
+          updated_at: string
+          year_built: number | null
+          zip_code: string
+        }
+        Insert: {
+          address: string
+          area: number
+          bathrooms: number
+          bedrooms: number
+          city: string
+          created_at?: string
+          description: string
+          featured?: boolean | null
+          features?: string[] | null
+          id?: string
+          images?: string[] | null
+          lat: number
+          listing_type: string
+          lng: number
+          parking?: number | null
+          price: number
+          state: string
+          title: string
+          type: string
+          updated_at?: string
+          year_built?: number | null
+          zip_code: string
+        }
+        Update: {
+          address?: string
+          area?: number
+          bathrooms?: number
+          bedrooms?: number
+          city?: string
+          created_at?: string
+          description?: string
+          featured?: boolean | null
+          features?: string[] | null
+          id?: string
+          images?: string[] | null
+          lat?: number
+          listing_type?: string
+          lng?: number
+          parking?: number | null
+          price?: number
+          state?: string
+          title?: string
+          type?: string
+          updated_at?: string
+          year_built?: number | null
+          zip_code?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
