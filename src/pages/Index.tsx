@@ -4,13 +4,12 @@ import { useProperties } from '@/contexts/PropertyContext';
 import { Link } from 'react-router-dom';
 import { Home, Shield, TrendingUp, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-
 export default function Index() {
-  const { properties } = useProperties();
-  const featuredProperties = properties.filter((p) => p.featured).slice(0, 3);
-
-  return (
-    <div className="min-h-screen">
+  const {
+    properties
+  } = useProperties();
+  const featuredProperties = properties.filter(p => p.featured).slice(0, 3);
+  return <div className="min-h-screen">
       {/* Hero Section */}
       <section className="relative bg-gradient-to-b from-primary/5 to-background py-20 lg:py-32">
         <div className="container mx-auto px-4">
@@ -18,9 +17,7 @@ export default function Index() {
             <h1 className="text-4xl lg:text-6xl font-bold text-foreground mb-6">
               Encontre o imóvel dos seus sonhos
             </h1>
-            <p className="text-xl text-muted-foreground mb-10">
-              O portal imobiliário mais completo de Florianópolis. Casas, apartamentos e terrenos para comprar ou alugar.
-            </p>
+            <p className="text-xl text-muted-foreground mb-10">O portal imobiliário mais completo de São José dos Campos. Casas, apartamentos e terrenos para comprar ou alugar.</p>
             
             {/* Search Bar */}
             <SearchBar size="large" className="max-w-2xl mx-auto" />
@@ -51,8 +48,7 @@ export default function Index() {
       </section>
 
       {/* Featured Properties */}
-      {featuredProperties.length > 0 && (
-        <section className="py-16 lg:py-24">
+      {featuredProperties.length > 0 && <section className="py-16 lg:py-24">
           <div className="container mx-auto px-4">
             <div className="flex items-center justify-between mb-8">
               <div>
@@ -67,20 +63,15 @@ export default function Index() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {featuredProperties.map((property) => (
-                <PropertyCard key={property.id} property={property} variant="featured" />
-              ))}
+              {featuredProperties.map(property => <PropertyCard key={property.id} property={property} variant="featured" />)}
             </div>
           </div>
-        </section>
-      )}
+        </section>}
 
       {/* Trust Section */}
       <section className="py-16 bg-secondary/50">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-foreground text-center mb-12">
-            Por que escolher a ImobPro?
-          </h2>
+          <h2 className="text-3xl font-bold text-foreground text-center mb-12">Por que escolher o Ícaro Correto de Imóveis?</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="text-center p-6">
@@ -144,11 +135,9 @@ export default function Index() {
                 <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary">
                   <Home className="h-5 w-5 text-primary-foreground" />
                 </div>
-                <span className="text-xl font-bold">ImobPro</span>
+                <span className="text-xl font-bold">Ícaro Corretor de Imóveis</span>
               </div>
-              <p className="text-background/70 text-sm">
-                O melhor portal imobiliário de Florianópolis. Encontre seu próximo lar conosco.
-              </p>
+              <p className="text-background/70 text-sm">O melhor portal imobiliário de São José dos Campos. Encontre seu próximo lar conosco.</p>
             </div>
 
             <div>
@@ -163,9 +152,9 @@ export default function Index() {
             <div>
               <h4 className="font-semibold mb-4">Regiões</h4>
               <ul className="space-y-2 text-background/70 text-sm">
-                <li><Link to="/buscar?q=Centro" className="hover:text-background">Centro</Link></li>
-                <li><Link to="/buscar?q=Jurerê" className="hover:text-background">Jurerê</Link></li>
-                <li><Link to="/buscar?q=Lagoa" className="hover:text-background">Lagoa da Conceição</Link></li>
+                <li>São José dos Campos<Link to="/buscar?q=Centro" className="hover:text-background">Centro</Link></li>
+                <li>Jacareí<Link to="/buscar?q=Jurerê" className="hover:text-background">Jurerê</Link></li>
+                <li>Caçapava<Link to="/buscar?q=Lagoa" className="hover:text-background">Lagoa da Conceição</Link></li>
                 <li><Link to="/buscar?q=Campeche" className="hover:text-background">Campeche</Link></li>
               </ul>
             </div>
@@ -173,18 +162,15 @@ export default function Index() {
             <div>
               <h4 className="font-semibold mb-4">Contato</h4>
               <ul className="space-y-2 text-background/70 text-sm">
-                <li>(48) 99999-9999</li>
-                <li>contato@imobpro.com.br</li>
-                <li>Florianópolis, SC</li>
+                <li>(12) 99196-8709</li>
+                <li>icaro@icarobroker.com.br</li>
+                <li>São José dos Campos, SP</li>
               </ul>
             </div>
           </div>
 
-          <div className="border-t border-background/10 mt-8 pt-8 text-center text-background/50 text-sm">
-            © 2024 ImobPro. Todos os direitos reservados.
-          </div>
+          <div className="border-t border-background/10 mt-8 pt-8 text-center text-background/50 text-sm">© 2026 Ícaro Corretor de Imóveis. Todos os direitos reservados.</div>
         </div>
       </footer>
-    </div>
-  );
+    </div>;
 }
