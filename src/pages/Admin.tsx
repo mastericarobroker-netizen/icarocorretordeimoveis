@@ -36,6 +36,7 @@ import {
   Eye,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { ImageUploader } from '@/components/ImageUploader';
 
 type PropertyFormData = Omit<Property, 'id' | 'createdAt' | 'updatedAt'>;
 
@@ -54,7 +55,7 @@ const initialFormData: PropertyFormData = {
   area: 0,
   type: 'house',
   listingType: 'sale',
-  images: ['https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=800'],
+  images: [],
   features: [],
   parking: 1,
 };
@@ -348,14 +349,11 @@ export default function Admin() {
                   </div>
 
                   <div className="col-span-2">
-                    <label className="text-sm font-medium">URL da Imagem</label>
-                    <Input
-                      value={formData.images[0]}
-                      onChange={(e) =>
-                        setFormData({ ...formData, images: [e.target.value] })
-                      }
-                      placeholder="https://..."
-                      required
+                    <label className="text-sm font-medium">Fotos do Imóvel (máx. 5)</label>
+                    <ImageUploader
+                      images={formData.images}
+                      onImagesChange={(images) => setFormData({ ...formData, images })}
+                      maxImages={5}
                     />
                   </div>
 
