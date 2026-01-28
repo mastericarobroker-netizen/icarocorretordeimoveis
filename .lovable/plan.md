@@ -1,183 +1,110 @@
 
-## Plano: Upload de Imagens para Imóveis (até 5 fotos)
+## Plano: Vincular Imóveis ao Corretor
 
 ### Visão Geral
-Implementar funcionalidade de upload de imagens do computador do usuário, permitindo até 5 fotos por imóvel, com armazenamento no Lovable Cloud.
+Adicionar uma coluna `user_id` na tabela de imóveis para vincular cada propriedade ao corretor responsável, e atribuir todos os imóveis existentes ao usuário `icaro.crsilva@gmail.com`.
 
 ---
 
-### Etapa 1: Criar Bucket de Armazenamento
-Criar um bucket público chamado `property-images` para armazenar as fotos dos imóveis.
+### Etapa 1: Criar sua Conta de Corretor
+
+Você precisa criar a conta manualmente pelo sistema de autenticação:
+
+1. Acesse a página de login (botão "Área do Corretor" no menu)
+2. Clique na aba "Cadastrar"
+3. Preencha os dados:
+   - **Nome**: Ícaro
+   - **Email**: icaro.crsilva@gmail.com
+   - **Senha**: Marte.1234
+4. Clique em "Criar conta"
+
+Isso é necessário porque senhas são armazenadas de forma segura (criptografadas) e não podem ser definidas diretamente no banco de dados.
+
+---
+
+### Etapa 2: Adicionar Coluna user_id na Tabela Properties
 
 **Migration SQL:**
 ```sql
--- Criar bucket para imagens de imóveis
-INSERT INTO storage.buckets (id, name, public)
-VALUES ('property-images', 'property-images', true);
+-- Adicionar coluna user_id para vincular imóveis a corretores
+ALTER TABLE public.properties
+ADD COLUMN user_id uuid REFERENCES auth.users(id) ON DELETE SET NULL;
 
--- Permitir upload público (para simplificar - pode adicionar auth depois)
-CREATE POLICY "Permitir upload de imagens"
-ON storage.objects FOR INSERT
-WITH CHECK (bucket_id = 'property-images');
-
--- Permitir visualização pública
-CREATE POLICY "Imagens são públicas"
-ON storage.objects FOR SELECT
-USING (bucket_id = 'property-images');
-
--- Permitir deleção
-CREATE POLICY "Permitir deletar imagens"
-ON storage.objects FOR DELETE
-USING (bucket_id = 'property-images');
+-- Criar índice para melhorar performance de consultas por corretor
+CREATE INDEX idx_properties_user_id ON public.properties(user_id);
 ```
 
 ---
 
-### Etapa 2: Criar Componente de Upload
-Novo arquivo: `src/components/ImageUploader.tsx`
+### Etapa 3: Vincular Imóveis Existentes ao Usuário
 
-**Funcionalidades:**
-- Aceitar arquivos de imagem (JPG, PNG, WebP)
-- Limite de 5 imagens
-- Preview das imagens selecionadas
-- Barra de progresso durante upload
-- Botão para remover imagens
-- Drag and drop (opcional)
+Após você criar a conta, executarei a atribuição dos imóveis:
 
-**Interface do componente:**
-```typescript
-interface ImageUploaderProps {
-  images: string[];           // URLs das imagens atuais
-  onImagesChange: (urls: string[]) => void;  // Callback quando mudar
-  maxImages?: number;         // Máximo de imagens (default: 5)
-}
-```
-
-**Layout visual:**
-```text
-┌─────────────────────────────────────────────────────┐
-│  ┌──────┐ ┌──────┐ ┌──────┐ ┌──────┐ ┌──────┐      │
-│  │ Img1 │ │ Img2 │ │ Img3 │ │  +   │ │      │      │
-│  │  ✕   │ │  ✕   │ │  ✕   │ │      │ │      │      │
-│  └──────┘ └──────┘ └──────┘ └──────┘ └──────┘      │
-│                                                     │
-│  [Clique ou arraste para adicionar fotos]          │
-│  Máximo: 5 imagens • Formatos: JPG, PNG, WebP      │
-└─────────────────────────────────────────────────────┘
+```sql
+-- Atualizar todos os imóveis para pertencerem ao corretor
+UPDATE public.properties
+SET user_id = (
+  SELECT id FROM auth.users 
+  WHERE email = 'icaro.crsilva@gmail.com'
+  LIMIT 1
+);
 ```
 
 ---
 
-### Etapa 3: Criar Hook de Upload
-Novo arquivo: `src/hooks/useImageUpload.ts`
+### Etapa 4: Atualizar RLS para Gestão por Corretor (Opcional)
 
-**Funcionalidades:**
-- Upload de arquivo para o Storage
-- Retorno da URL pública
-- Gerenciamento de estado de loading
-- Tratamento de erros
-- Deleção de imagens
+Se desejar que cada corretor veja apenas seus próprios imóveis no painel:
 
-```typescript
-export function useImageUpload() {
-  const uploadImage = async (file: File): Promise<string> => {
-    // Gera nome único para o arquivo
-    // Faz upload para bucket 'property-images'
-    // Retorna URL pública
-  };
-  
-  const deleteImage = async (url: string): Promise<void> => {
-    // Extrai path do arquivo da URL
-    // Remove do storage
-  };
-  
-  return { uploadImage, deleteImage, isUploading };
-}
+```sql
+-- Política: Corretores podem ver apenas seus imóveis
+CREATE POLICY "Corretores veem seus imóveis"
+ON public.properties FOR SELECT
+TO authenticated
+USING (user_id = auth.uid() OR user_id IS NULL);
+
+-- Política: Corretores podem editar apenas seus imóveis
+CREATE POLICY "Corretores editam seus imóveis"
+ON public.properties FOR UPDATE
+TO authenticated
+USING (user_id = auth.uid());
 ```
-
----
-
-### Etapa 4: Atualizar Formulário do Admin
-Arquivo: `src/pages/Admin.tsx`
-
-**Alterações:**
-1. Importar o novo componente `ImageUploader`
-2. Substituir o input de URL pelo componente de upload
-3. Atualizar o `formData.images` com as URLs retornadas
-
-**Antes (linha 350-360):**
-```tsx
-<div className="col-span-2">
-  <label className="text-sm font-medium">URL da Imagem</label>
-  <Input
-    value={formData.images[0]}
-    onChange={(e) => setFormData({ ...formData, images: [e.target.value] })}
-    placeholder="https://..."
-    required
-  />
-</div>
-```
-
-**Depois:**
-```tsx
-<div className="col-span-2">
-  <label className="text-sm font-medium">Fotos do Imóvel (máx. 5)</label>
-  <ImageUploader
-    images={formData.images}
-    onImagesChange={(images) => setFormData({ ...formData, images })}
-    maxImages={5}
-  />
-</div>
-```
-
----
-
-### Etapa 5: Validações e UX
-
-**Validações de arquivo:**
-- Tamanho máximo: 5MB por imagem
-- Tipos permitidos: image/jpeg, image/png, image/webp
-- Quantidade máxima: 5 imagens
-
-**Feedback visual:**
-- Loading spinner durante upload
-- Barra de progresso
-- Toast de sucesso/erro
-- Confirmação ao remover imagem
 
 ---
 
 ### Resumo das Alterações
 
-| Arquivo | Ação |
-|---------|------|
-| `supabase/migrations/...` | Criar bucket `property-images` com políticas RLS |
-| `src/hooks/useImageUpload.ts` | Novo hook para upload/delete de imagens |
-| `src/components/ImageUploader.tsx` | Novo componente de upload com preview |
-| `src/pages/Admin.tsx` | Substituir input de URL pelo ImageUploader |
+| Componente | Ação |
+|------------|------|
+| Usuário | Criar conta via formulário de cadastro |
+| `properties` table | Adicionar coluna `user_id` |
+| Dados existentes | UPDATE para vincular ao usuário criado |
+| `types.ts` | Atualizado automaticamente com nova coluna |
 
 ---
 
-### Detalhes Técnicos
+### Fluxo de Execução
 
-**Estrutura do Storage:**
-```
-property-images/
-├── {uuid1}.jpg
-├── {uuid2}.png
-└── {uuid3}.webp
+```text
+┌─────────────────────────────────────────────────────┐
+│  1. Você cria conta no sistema                      │
+│     └─> Email: icaro.crsilva@gmail.com              │
+│     └─> Senha: Marte.1234                           │
+├─────────────────────────────────────────────────────┤
+│  2. Migration adiciona coluna user_id               │
+│     └─> ALTER TABLE properties ADD user_id          │
+├─────────────────────────────────────────────────────┤
+│  3. UPDATE vincula imóveis ao seu usuário           │
+│     └─> UPDATE properties SET user_id = (seu id)    │
+├─────────────────────────────────────────────────────┤
+│  4. (Opcional) RLS restringe acesso por corretor    │
+└─────────────────────────────────────────────────────┘
 ```
 
-**URL pública gerada:**
-```
-https://cofugilxrxujpcjluhxt.supabase.co/storage/v1/object/public/property-images/{filename}
-```
+---
 
-**Fluxo de upload:**
-1. Usuário seleciona arquivo(s)
-2. Valida tipo e tamanho
-3. Gera nome único (UUID)
-4. Faz upload para Supabase Storage
-5. Obtém URL pública
-6. Adiciona ao array de imagens do formulário
-7. Ao salvar imóvel, URLs são persistidas na coluna `images`
+### Próximos Passos
+
+1. **Crie sua conta** pelo formulário de cadastro
+2. **Me avise** quando tiver criado a conta
+3. Executarei a migration e o UPDATE para vincular os imóveis
