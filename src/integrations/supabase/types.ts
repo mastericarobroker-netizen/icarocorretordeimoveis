@@ -104,6 +104,7 @@ export type Database = {
           title: string
           type: string
           updated_at: string
+          user_id: string | null
           year_built: number | null
           zip_code: string
         }
@@ -128,6 +129,7 @@ export type Database = {
           title: string
           type: string
           updated_at?: string
+          user_id?: string | null
           year_built?: number | null
           zip_code: string
         }
@@ -152,6 +154,7 @@ export type Database = {
           title?: string
           type?: string
           updated_at?: string
+          user_id?: string | null
           year_built?: number | null
           zip_code?: string
         }
