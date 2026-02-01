@@ -420,129 +420,133 @@ export default function Admin() {
         {/* Properties Table */}
         {activeTab === 'properties' && (
           <div className="bg-card rounded-lg border border-border overflow-hidden">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Imóvel</TableHead>
-                  <TableHead>Tipo</TableHead>
-                  <TableHead>Preço</TableHead>
-                  <TableHead>Cidade</TableHead>
-                  <TableHead className="text-right">Ações</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {properties.map((property) => (
-                  <TableRow key={property.id}>
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <img
-                          src={property.images[0]}
-                          alt={property.title}
-                          className="w-16 h-12 object-cover rounded"
-                        />
-                        <div>
-                          <p className="font-medium text-foreground line-clamp-1">
-                            {property.title}
-                          </p>
-                          <p className="text-sm text-muted-foreground">
-                            {property.bedrooms} quartos • {property.area} m²
-                          </p>
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <span
-                        className={`px-2 py-1 text-xs font-medium rounded ${property.listingType === 'sale'
-                          ? 'bg-success/10 text-success'
-                          : 'bg-warning/10 text-warning'
-                          }`}
-                      >
-                        {property.listingType === 'sale' ? 'Venda' : 'Aluguel'}
-                      </span>
-                    </TableCell>
-                    <TableCell className="font-medium">
-                      {formatPrice(property.price)}
-                    </TableCell>
-                    <TableCell>{property.city}</TableCell>
-                    <TableCell>
-                      <div className="flex justify-end gap-2">
-                        <Link to={`/imovel/${property.id}`}>
-                          <Button variant="ghost" size="sm">
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                        </Link>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleOpenDialog(property)}
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDelete(property.id)}
-                          className="text-destructive hover:text-destructive"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Imóvel</TableHead>
+                    <TableHead>Tipo</TableHead>
+                    <TableHead>Preço</TableHead>
+                    <TableHead>Cidade</TableHead>
+                    <TableHead className="text-right">Ações</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {properties.map((property) => (
+                    <TableRow key={property.id}>
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <img
+                            src={property.images[0]}
+                            alt={property.title}
+                            className="w-16 h-12 object-cover rounded"
+                          />
+                          <div>
+                            <p className="font-medium text-foreground line-clamp-1">
+                              {property.title}
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              {property.bedrooms} quartos • {property.area} m²
+                            </p>
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <span
+                          className={`px-2 py-1 text-xs font-medium rounded ${property.listingType === 'sale'
+                            ? 'bg-success/10 text-success'
+                            : 'bg-warning/10 text-warning'
+                            }`}
+                        >
+                          {property.listingType === 'sale' ? 'Venda' : 'Aluguel'}
+                        </span>
+                      </TableCell>
+                      <TableCell className="font-medium">
+                        {formatPrice(property.price)}
+                      </TableCell>
+                      <TableCell>{property.city}</TableCell>
+                      <TableCell>
+                        <div className="flex justify-end gap-2">
+                          <Link to={`/imovel/${property.id}`}>
+                            <Button variant="ghost" size="sm">
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                          </Link>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleOpenDialog(property)}
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDelete(property.id)}
+                            className="text-destructive hover:text-destructive"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           </div>
         )}
 
         {/* Leads Table */}
         {activeTab === 'leads' && (
           <div className="bg-card rounded-lg border border-border overflow-hidden">
-            {leads.length > 0 ? (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Nome</TableHead>
-                    <TableHead>Contato</TableHead>
-                    <TableHead>Mensagem</TableHead>
-                    <TableHead>Data</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {leads.map((lead) => (
-                    <TableRow key={lead.id}>
-                      <TableCell className="font-medium">{lead.name}</TableCell>
-                      <TableCell>
-                        <div>
-                          <p className="text-sm">{lead.email}</p>
-                          <p className="text-sm text-muted-foreground">
-                            {lead.phone}
-                          </p>
-                        </div>
-                      </TableCell>
-                      <TableCell className="max-w-xs">
-                        <p className="line-clamp-2 text-sm text-muted-foreground">
-                          {lead.message}
-                        </p>
-                      </TableCell>
-                      <TableCell className="text-sm text-muted-foreground">
-                        {new Date(lead.createdAt).toLocaleDateString('pt-BR')}
-                      </TableCell>
+            <div className="overflow-x-auto">
+              {leads.length > 0 ? (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Nome</TableHead>
+                      <TableHead>Contato</TableHead>
+                      <TableHead>Mensagem</TableHead>
+                      <TableHead>Data</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            ) : (
-              <div className="p-12 text-center">
-                <MessageSquare className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                <h3 className="text-lg font-medium text-foreground mb-2">
-                  Nenhum lead recebido ainda
-                </h3>
-                <p className="text-muted-foreground">
-                  Os contatos dos interessados aparecerão aqui.
-                </p>
-              </div>
-            )}
+                  </TableHeader>
+                  <TableBody>
+                    {leads.map((lead) => (
+                      <TableRow key={lead.id}>
+                        <TableCell className="font-medium">{lead.name}</TableCell>
+                        <TableCell>
+                          <div>
+                            <p className="text-sm">{lead.email}</p>
+                            <p className="text-sm text-muted-foreground">
+                              {lead.phone}
+                            </p>
+                          </div>
+                        </TableCell>
+                        <TableCell className="max-w-xs">
+                          <p className="line-clamp-2 text-sm text-muted-foreground">
+                            {lead.message}
+                          </p>
+                        </TableCell>
+                        <TableCell className="text-sm text-muted-foreground">
+                          {new Date(lead.createdAt).toLocaleDateString('pt-BR')}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              ) : (
+                <div className="p-12 text-center">
+                  <MessageSquare className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                  <h3 className="text-lg font-medium text-foreground mb-2">
+                    Nenhum lead recebido ainda
+                  </h3>
+                  <p className="text-muted-foreground">
+                    Os contatos dos interessados aparecerão aqui.
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
         )}
       </div>

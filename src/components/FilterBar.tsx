@@ -65,7 +65,7 @@ export function FilterBar() {
   };
 
   return (
-    <div className="flex flex-wrap items-center gap-3 p-4 bg-card border-b border-border">
+    <div className="flex flex-nowrap items-center gap-3 p-4 bg-card border-b border-border overflow-x-auto scrollbar-none">
       {/* Listing Type */}
       <Select
         value={filters.listingType || 'all'}
