@@ -21,7 +21,7 @@ import { toast } from 'sonner';
 export default function PropertyDetails() {
   const { id } = useParams<{ id: string }>();
   const { getPropertyById } = useProperties();
-  
+
   const property = id ? getPropertyById(id) : undefined;
 
   if (!property) {
@@ -105,11 +105,10 @@ export default function PropertyDetails() {
             <div>
               <div className="flex items-center gap-3 mb-2">
                 <span
-                  className={`px-3 py-1 text-sm font-semibold rounded ${
-                    property.listingType === 'sale'
+                  className={`px-3 py-1 text-sm font-semibold rounded ${property.listingType === 'sale'
                       ? 'bg-success text-success-foreground'
                       : 'bg-warning text-warning-foreground'
-                  }`}
+                    }`}
                 >
                   {property.listingType === 'sale' ? 'Venda' : 'Aluguel'}
                 </span>
@@ -126,7 +125,7 @@ export default function PropertyDetails() {
 
               <p className="flex items-center gap-2 text-muted-foreground">
                 <MapPin className="h-4 w-4" />
-                {property.address}, {property.city} - {property.state}, {property.zipCode}
+                {property.address}, {property.city}, {property.zipCode}
               </p>
             </div>
 

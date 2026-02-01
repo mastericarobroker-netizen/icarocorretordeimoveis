@@ -46,7 +46,7 @@ const initialFormData: PropertyFormData = {
   price: 0,
   address: '',
   city: 'Florianópolis',
-  state: 'SC',
+  state: 'SP',
   zipCode: '',
   lat: -27.5969,
   lng: -48.5495,
@@ -453,8 +453,8 @@ export default function Admin() {
                     <TableCell>
                       <span
                         className={`px-2 py-1 text-xs font-medium rounded ${property.listingType === 'sale'
-                            ? 'bg-success/10 text-success'
-                            : 'bg-warning/10 text-warning'
+                          ? 'bg-success/10 text-success'
+                          : 'bg-warning/10 text-warning'
                           }`}
                       >
                         {property.listingType === 'sale' ? 'Venda' : 'Aluguel'}
