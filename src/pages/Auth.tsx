@@ -1,0 +1,218 @@
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { toast } from 'sonner';
+import { Home, Loader2, Mail, Lock, User } from 'lucide-react';
+import { Link } from 'react-router-dom';
+
+export default function Auth() {
+  const navigate = useNavigate();
+  const { signIn, signUp } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
+  
+  // Login form
+  const [loginEmail, setLoginEmail] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
+  
+  // Register form
+  const [registerName, setRegisterName] = useState('');
+  const [registerEmail, setRegisterEmail] = useState('');
+  const [registerPassword, setRegisterPassword] = useState('');
+  const [registerConfirmPassword, setRegisterConfirmPassword] = useState('');
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    const { error } = await signIn(loginEmail, loginPassword);
+    
+    if (error) {
+      toast.error('Erro ao fazer login: ' + error.message);
+    } else {
+      toast.success('Login realizado com sucesso!');
+      navigate('/admin');
+    }
+    
+    setIsLoading(false);
+  };
+
+  const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (registerPassword !== registerConfirmPassword) {
+      toast.error('As senhas não coincidem');
+      return;
+    }
+
+    if (registerPassword.length < 6) {
+      toast.error('A senha deve ter pelo menos 6 caracteres');
+      return;
+    }
+
+    setIsLoading(true);
+
+    const { error } = await signUp(registerEmail, registerPassword, registerName);
+    
+    if (error) {
+      toast.error('Erro ao criar conta: ' + error.message);
+    } else {
+      toast.success('Conta criada com sucesso! Você já pode acessar.');
+      navigate('/admin');
+    }
+    
+    setIsLoading(false);
+  };
+
+  return (
+    <div className="min-h-screen bg-secondary/30 flex items-center justify-center px-4 py-12">
+      <div className="w-full max-w-md">
+        {/* Logo */}
+        <div className="flex flex-col items-center mb-8">
+          <Link to="/" className="flex items-center gap-2 mb-2">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary">
+              <Home className="h-6 w-6 text-primary-foreground" />
+            </div>
+          </Link>
+          <h1 className="text-2xl font-bold text-foreground">Área do Corretor</h1>
+          <p className="text-muted-foreground text-sm">Acesse sua conta para gerenciar imóveis</p>
+        </div>
+
+        <Card>
+          <CardHeader className="space-y-1">
+            <CardTitle className="text-xl">Bem-vindo</CardTitle>
+            <CardDescription>
+              Entre com sua conta ou crie uma nova
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Tabs defaultValue="login" className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="login">Entrar</TabsTrigger>
+                <TabsTrigger value="register">Cadastrar</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="login" className="space-y-4 mt-4">
+                <form onSubmit={handleLogin} className="space-y-4">
+                  <div className="space-y-2">
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        type="email"
+                        placeholder="Email"
+                        value={loginEmail}
+                        onChange={(e) => setLoginEmail(e.target.value)}
+                        className="pl-10"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        type="password"
+                        placeholder="Senha"
+                        value={loginPassword}
+                        onChange={(e) => setLoginPassword(e.target.value)}
+                        className="pl-10"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <Button type="submit" className="w-full" disabled={isLoading}>
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Entrando...
+                      </>
+                    ) : (
+                      'Entrar'
+                    )}
+                  </Button>
+                </form>
+              </TabsContent>
+
+              <TabsContent value="register" className="space-y-4 mt-4">
+                <form onSubmit={handleRegister} className="space-y-4">
+                  <div className="space-y-2">
+                    <div className="relative">
+                      <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        type="text"
+                        placeholder="Nome completo"
+                        value={registerName}
+                        onChange={(e) => setRegisterName(e.target.value)}
+                        className="pl-10"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        type="email"
+                        placeholder="Email"
+                        value={registerEmail}
+                        onChange={(e) => setRegisterEmail(e.target.value)}
+                        className="pl-10"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        type="password"
+                        placeholder="Senha (mín. 6 caracteres)"
+                        value={registerPassword}
+                        onChange={(e) => setRegisterPassword(e.target.value)}
+                        className="pl-10"
+                        required
+                        minLength={6}
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        type="password"
+                        placeholder="Confirmar senha"
+                        value={registerConfirmPassword}
+                        onChange={(e) => setRegisterConfirmPassword(e.target.value)}
+                        className="pl-10"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <Button type="submit" className="w-full" disabled={isLoading}>
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Criando conta...
+                      </>
+                    ) : (
+                      'Criar conta'
+                    )}
+                  </Button>
+                </form>
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
+
+        <p className="text-center text-sm text-muted-foreground mt-4">
+          <Link to="/" className="hover:text-foreground transition-colors">
+            ← Voltar para o site
+          </Link>
+        </p>
+      </div>
+    </div>
+  );
+}

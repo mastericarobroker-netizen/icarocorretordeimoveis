@@ -1,0 +1,263 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Zillow-inspired Design System */
+
+@layer base {
+  :root {
+    /* Core Zillow Colors */
+    --background: 0 0% 100%;
+    --foreground: 240 11% 18%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 240 11% 18%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 11% 18%;
+
+    /* Zillow Blue Primary */
+    --primary: 209 88% 48%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Secondary - Light Gray */
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 240 11% 18%;
+
+    /* Muted - For subtle backgrounds */
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 9% 46%;
+
+    /* Accent - Hover states */
+    --accent: 209 88% 95%;
+    --accent-foreground: 209 88% 40%;
+
+    /* Destructive */
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* Success - For available/featured */
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 100%;
+
+    /* Warning */
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+
+    /* Borders and inputs */
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 209 88% 48%;
+
+    --radius: 0.5rem;
+
+    /* Custom shadows */
+    --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.08);
+    --shadow-card-hover: 0 4px 16px rgba(0, 0, 0, 0.12);
+    --shadow-dropdown: 0 4px 20px rgba(0, 0, 0, 0.15);
+
+    /* Sidebar */
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 209 88% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 14% 96%;
+    --sidebar-accent-foreground: 240 11% 18%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 209 88% 48%;
+  }
+
+  .dark {
+    --background: 240 10% 8%;
+    --foreground: 0 0% 95%;
+
+    --card: 240 10% 10%;
+    --card-foreground: 0 0% 95%;
+
+    --popover: 240 10% 10%;
+    --popover-foreground: 0 0% 95%;
+
+    --primary: 209 88% 55%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 240 6% 16%;
+    --secondary-foreground: 0 0% 95%;
+
+    --muted: 240 6% 16%;
+    --muted-foreground: 220 9% 60%;
+
+    --accent: 209 50% 20%;
+    --accent-foreground: 209 88% 70%;
+
+    --destructive: 0 62% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 240 6% 20%;
+    --input: 240 6% 20%;
+    --ring: 209 88% 55%;
+
+    --sidebar-background: 240 10% 8%;
+    --sidebar-foreground: 0 0% 95%;
+    --sidebar-primary: 209 88% 55%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 6% 16%;
+    --sidebar-accent-foreground: 0 0% 95%;
+    --sidebar-border: 240 6% 20%;
+    --sidebar-ring: 209 88% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-family: 'Open Sans', system-ui, -apple-system, sans-serif;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-semibold tracking-tight;
+  }
+}
+
+@layer components {
+
+  /* Property Card Styles */
+  .property-card {
+    @apply bg-card rounded-lg overflow-hidden transition-all duration-200;
+    box-shadow: var(--shadow-card);
+  }
+
+  .property-card:hover {
+    box-shadow: var(--shadow-card-hover);
+    transform: translateY(-2px);
+  }
+
+  /* Price Tag */
+  .price-tag {
+    @apply text-2xl font-bold text-foreground;
+  }
+
+  /* Search Input */
+  .search-input {
+    @apply w-full h-14 px-5 text-lg bg-card border-2 border-border rounded-lg;
+    @apply focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20;
+    @apply transition-all duration-200;
+  }
+
+  /* Filter Button */
+  .filter-btn {
+    @apply px-4 py-2 text-sm font-medium bg-card border border-border rounded-lg;
+    @apply hover:bg-secondary hover:border-primary/30 transition-all duration-200;
+  }
+
+  .filter-btn.active {
+    @apply bg-primary text-primary-foreground border-primary;
+  }
+
+  /* Map Container */
+  .map-container {
+    @apply w-full h-full min-h-[400px];
+  }
+
+  /* Split View Layout */
+  /* Split View Layout */
+  .split-view {
+    @apply flex flex-col lg:flex-row flex-1 min-h-0;
+  }
+
+  .split-view-map {
+    @apply w-full h-[350px] lg:h-full lg:w-[55%] xl:w-[60%] order-1 lg:order-1 relative;
+  }
+
+  .split-view-list {
+    @apply w-full lg:w-[45%] xl:w-[40%] flex-1 lg:h-full overflow-y-auto order-2 lg:order-2;
+    @apply bg-background border-l border-border;
+  }
+}
+
+@layer utilities {
+
+  /* Custom scrollbar */
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--border)) transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--border));
+    border-radius: 3px;
+  }
+}
+
+/* Leaflet customizations */
+.leaflet-container {
+  font-family: 'Open Sans', system-ui, -apple-system, sans-serif;
+  z-index: 1;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 8px;
+  box-shadow: var(--shadow-dropdown);
+}
+
+.leaflet-popup-content {
+  margin: 0;
+  padding: 0;
+}
+
+/* Marker Styles */
+.custom-marker {
+  @apply relative flex items-center justify-center;
+  background-color: #991b1b;
+  /* Red-800 */
+  color: white;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  /* Pill shape */
+  font-weight: 700;
+  font-size: 13px;
+  white-space: nowrap;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  border: 1px solid white;
+  transition: all 0.2s ease;
+}
+
+.custom-marker::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 6px solid #991b1b;
+  /* Match background */
+}
+
+.custom-marker.selected {
+  background-color: #000000;
+  z-index: 50 !important;
+  transform: scale(1.1);
+}
+
+.custom-marker.selected::after {
+  border-top-color: #000000;
+}
