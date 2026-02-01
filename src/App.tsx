@@ -6,6 +6,7 @@ import { PropertyProvider } from "@/contexts/PropertyContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { Navbar } from "@/components/Navbar";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { WhatsAppButton } from "@/components/WhatsAppButton";
 import Index from "./pages/Index";
 import Search from "./pages/Search";
 import PropertyDetails from "./pages/PropertyDetails";
@@ -39,6 +40,7 @@ const App = () => (
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
+            <WhatsAppButton />
           </BrowserRouter>
         </PropertyProvider>
       </AuthProvider>

@@ -452,11 +452,10 @@ export default function Admin() {
                     </TableCell>
                     <TableCell>
                       <span
-                        className={`px-2 py-1 text-xs font-medium rounded ${
-                          property.listingType === 'sale'
+                        className={`px-2 py-1 text-xs font-medium rounded ${property.listingType === 'sale'
                             ? 'bg-success/10 text-success'
                             : 'bg-warning/10 text-warning'
-                        }`}
+                          }`}
                       >
                         {property.listingType === 'sale' ? 'Venda' : 'Aluguel'}
                       </span>
