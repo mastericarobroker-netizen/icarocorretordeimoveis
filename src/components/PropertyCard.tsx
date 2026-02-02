@@ -78,16 +78,17 @@ export function PropertyCard({
             {property.type !== 'land' && (
               <div className="flex items-center gap-3 mt-1 text-sm text-foreground/80">
                 <span className="flex items-center gap-1">
+                  <Bed className="h-3.5 w-3.5 text-muted-foreground" />
                   <span className="font-bold">{property.bedrooms}</span>
-                  <span className="text-xs">bds</span>
                 </span>
                 <span className="flex items-center gap-1">
+                  <Bath className="h-3.5 w-3.5 text-muted-foreground" />
                   <span className="font-bold">{property.bathrooms}</span>
-                  <span className="text-xs">ba</span>
                 </span>
                 <span className="flex items-center gap-1">
+                  <Square className="h-3.5 w-3.5 text-muted-foreground" />
                   <span className="font-bold">{property.area}</span>
-                  <span className="text-xs">m²</span>
+                  <span className="text-[10px]">m²</span>
                 </span>
               </div>
             )}
@@ -150,18 +151,22 @@ export function PropertyCard({
         {/* Stats - Pipe Separated */}
         {property.type !== 'land' && (
           <div className="flex items-center text-[15px] text-foreground font-normal leading-tight">
+            <Bed className="h-4 w-4 mr-1 text-muted-foreground" />
             <span className="font-bold">{property.bedrooms}</span>
-            <span className="ml-1 mr-2">bds</span>
-            <span className="text-border mx-1">|</span>
+            <span className="text-border mx-2">|</span>
 
+            <Bath className="h-4 w-4 mr-1 text-muted-foreground" />
             <span className="font-bold ml-1">{property.bathrooms}</span>
-            <span className="ml-1 mr-2">ba</span>
-            <span className="text-border mx-1">|</span>
+            <span className="text-border mx-2">|</span>
 
+            <Square className="h-4 w-4 mr-1 text-muted-foreground" />
             <span className="font-bold ml-1">{property.area}</span>
-            <span className="ml-1">m²</span>
+            <span className="ml-0.5 text-xs">m²</span>
+
             <span className="mx-2 text-muted-foreground">-</span>
-            <span className="truncate text-muted-foreground">{typeLabels[property.type]} for {property.listingType === 'sale' ? 'sale' : 'rent'}</span>
+            <span className="truncate text-muted-foreground">
+              {typeLabels[property.type]} para {property.listingType === 'sale' ? 'venda' : 'aluguel'}
+            </span>
           </div>
         )}
 

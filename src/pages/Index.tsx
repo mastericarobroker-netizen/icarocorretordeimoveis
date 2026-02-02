@@ -4,10 +4,21 @@ import { useProperties } from '@/contexts/PropertyContext';
 import { Link } from 'react-router-dom';
 import { Home, Shield, TrendingUp, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogDescription,
+} from '@/components/ui/dialog';
+import { PropertyCaptureForm } from '@/components/PropertyCaptureForm';
+import { useState } from 'react';
 export default function Index() {
   const {
     properties
   } = useProperties();
+  const [isCaptureDialogOpen, setIsCaptureDialogOpen] = useState(false);
   const featuredProperties = properties.filter(p => p.featured).slice(0, 3);
   return <div className="min-h-screen">
     {/* Hero Section */}
@@ -117,11 +128,22 @@ export default function Index() {
           <p className="text-primary-foreground/80 text-lg mb-8 max-w-2xl mx-auto">
             Anuncie com a gente e alcance milhares de interessados. Avaliação gratuita e sem compromisso.
           </p>
-          <Link to="/admin">
-            <Button size="lg" variant="secondary">
-              Anunciar meu imóvel
-            </Button>
-          </Link>
+          <Dialog open={isCaptureDialogOpen} onOpenChange={setIsCaptureDialogOpen}>
+            <DialogTrigger asChild>
+              <Button size="lg" variant="secondary">
+                Anunciar meu imóvel
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle>Anunciar meu imóvel</DialogTitle>
+                <DialogDescription>
+                  Preencha os dados abaixo e entraremos em contato para avaliar seu imóvel.
+                </DialogDescription>
+              </DialogHeader>
+              <PropertyCaptureForm onSuccess={() => setIsCaptureDialogOpen(false)} />
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
     </section>
@@ -152,10 +174,10 @@ export default function Index() {
           <div>
             <h4 className="font-semibold mb-4">Regiões</h4>
             <ul className="space-y-2 text-background/70 text-sm">
-              <li>São José dos Campos<Link to="/buscar?q=Centro" className="hover:text-background">Centro</Link></li>
-              <li>Jacareí<Link to="/buscar?q=Jurerê" className="hover:text-background">Jurerê</Link></li>
-              <li>Caçapava<Link to="/buscar?q=Lagoa" className="hover:text-background">Lagoa da Conceição</Link></li>
-              <li><Link to="/buscar?q=Campeche" className="hover:text-background">Campeche</Link></li>
+              <li>São José dos Campos<Link to="/buscar?q=Centro" className="hover:text-background"></Link></li>
+              <li>Jacareí<Link to="/buscar?q=Jacareí" className="hover:text-background"></Link></li>
+              <li>Caçapava<Link to="/buscar?q=Caçapava" className="hover:text-background"></Link></li>
+              <li>Caraguatatuba<Link to="/buscar?q=Caraguatatuba" className="hover:text-background"></Link></li>
             </ul>
           </div>
 

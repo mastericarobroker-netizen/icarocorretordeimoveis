@@ -1,7 +1,8 @@
 import React, { createContext, useContext, useState, useMemo } from 'react';
-import { Property, PropertyFilters, Lead } from '@/types/property';
+import { Property, PropertyFilters, Lead, PropertyCapture } from '@/types/property';
 import { usePropertiesQuery, useCreateProperty, useUpdateProperty, useDeleteProperty } from '@/hooks/usePropertiesQuery';
-import { useLeadsQuery, useCreateLead } from '@/hooks/useLeadsQuery';
+import { useLeadsQuery, useCreateLead, useUpdateLead, useDeleteLead } from '@/hooks/useLeadsQuery';
+import { useCapturesQuery, useCreateCapture, useUpdateCapture, useDeleteCapture } from '@/hooks/useCapturesQuery';
 
 interface PropertyContextType {
   properties: Property[];
@@ -13,7 +14,13 @@ interface PropertyContextType {
   updateProperty: (id: string, property: Partial<Property>) => void;
   deleteProperty: (id: string) => void;
   leads: Lead[];
-  addLead: (lead: { propertyId: string; name: string; email: string; phone: string; message: string }) => void;
+  addLead: (lead: { propertyId: string; name: string; email: string; phone: string; message: string }) => Promise<any>;
+  updateLead: (id: string, updates: Partial<Lead>) => void;
+  deleteLead: (id: string) => void;
+  captures: PropertyCapture[];
+  addCapture: (capture: { name: string; phone: string; address: string; description: string }) => Promise<any>;
+  updateCapture: (id: string, updates: Partial<PropertyCapture>) => void;
+  deleteCapture: (id: string) => void;
   searchQuery: string;
   setSearchQuery: (query: string) => void;
   selectedProperty: Property | null;
@@ -31,19 +38,25 @@ export function PropertyProvider({ children }: { children: React.ReactNode }) {
   // Query properties from database
   const { data: properties = [], isLoading } = usePropertiesQuery();
   const { data: leads = [] } = useLeadsQuery();
-  
+  const { data: captures = [] } = useCapturesQuery();
+
   // Mutations
   const createPropertyMutation = useCreateProperty();
   const updatePropertyMutation = useUpdateProperty();
   const deletePropertyMutation = useDeleteProperty();
   const createLeadMutation = useCreateLead();
+  const updateLeadMutation = useUpdateLead();
+  const deleteLeadMutation = useDeleteLead();
+  const createCaptureMutation = useCreateCapture();
+  const updateCaptureMutation = useUpdateCapture();
+  const deleteCaptureMutation = useDeleteCapture();
 
   const filteredProperties = useMemo(() => {
     return properties.filter((property) => {
       // Search query filter
       if (searchQuery) {
         const query = searchQuery.toLowerCase();
-        const matchesQuery = 
+        const matchesQuery =
           property.title.toLowerCase().includes(query) ||
           property.address.toLowerCase().includes(query) ||
           property.city.toLowerCase().includes(query) ||
@@ -91,7 +104,27 @@ export function PropertyProvider({ children }: { children: React.ReactNode }) {
   };
 
   const addLead = (lead: { propertyId: string; name: string; email: string; phone: string; message: string }) => {
-    createLeadMutation.mutate(lead);
+    return createLeadMutation.mutateAsync({ ...lead, status: 'Novo' });
+  };
+
+  const updateLead = (id: string, updates: Partial<Lead>) => {
+    updateLeadMutation.mutate({ id, updates });
+  };
+
+  const deleteLead = (id: string) => {
+    deleteLeadMutation.mutate(id);
+  };
+
+  const addCapture = (capture: { name: string; phone: string; address: string; description: string }) => {
+    return createCaptureMutation.mutateAsync({ ...capture, status: 'Novo' });
+  };
+
+  const updateCapture = (id: string, updates: Partial<PropertyCapture>) => {
+    updateCaptureMutation.mutate({ id, updates });
+  };
+
+  const deleteCapture = (id: string) => {
+    deleteCaptureMutation.mutate(id);
   };
 
   return (
@@ -107,6 +140,12 @@ export function PropertyProvider({ children }: { children: React.ReactNode }) {
         deleteProperty,
         leads,
         addLead,
+        updateLead,
+        deleteLead,
+        captures,
+        addCapture,
+        updateCapture,
+        deleteCapture,
         searchQuery,
         setSearchQuery,
         selectedProperty,

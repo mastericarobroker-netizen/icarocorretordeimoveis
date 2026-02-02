@@ -13,7 +13,7 @@ import { cn } from '@/lib/utils';
 export default function Search() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
+  const [viewMode, setViewMode] = useState<'list' | 'map'>('map');
   const {
     filteredProperties,
     setFilters,

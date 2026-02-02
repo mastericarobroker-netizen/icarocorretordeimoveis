@@ -44,9 +44,9 @@ export function Navbar() {
             <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary">
               <Home className="h-5 w-5 text-primary-foreground" />
             </div>
-            <span className="text-xl font-bold text-foreground hidden xs:block truncate max-w-[150px] sm:max-w-none">
+            <span className="text-xl font-bold text-foreground truncate sm:max-w-none">
               Ícaro Corretor
-              <span className="hidden sm:inline"> de Imóveis</span>
+              <span className="hidden xs:inline"> de Imóveis</span>
             </span>
           </Link>
 
