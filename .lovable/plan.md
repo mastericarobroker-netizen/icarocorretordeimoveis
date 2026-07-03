@@ -1,110 +1,69 @@
+## Plano: Remover Cadastro na Área do Corretor
 
-## Plano: Vincular Imóveis ao Corretor
-
-### Visão Geral
-Adicionar uma coluna `user_id` na tabela de imóveis para vincular cada propriedade ao corretor responsável, e atribuir todos os imóveis existentes ao usuário `icaro.crsilva@gmail.com`.
-
----
-
-### Etapa 1: Criar sua Conta de Corretor
-
-Você precisa criar a conta manualmente pelo sistema de autenticação:
-
-1. Acesse a página de login (botão "Área do Corretor" no menu)
-2. Clique na aba "Cadastrar"
-3. Preencha os dados:
-   - **Nome**: Ícaro
-   - **Email**: icaro.crsilva@gmail.com
-   - **Senha**: Marte.1234
-4. Clique em "Criar conta"
-
-Isso é necessário porque senhas são armazenadas de forma segura (criptografadas) e não podem ser definidas diretamente no banco de dados.
+### Objetivo
+Deixar a Área do Corretor apenas com a opção **Entrar**. Novos usuários serão criados manualmente por você no backend.
 
 ---
 
-### Etapa 2: Adicionar Coluna user_id na Tabela Properties
+### Alterações na Interface
 
-**Migration SQL:**
-```sql
--- Adicionar coluna user_id para vincular imóveis a corretores
-ALTER TABLE public.properties
-ADD COLUMN user_id uuid REFERENCES auth.users(id) ON DELETE SET NULL;
+**Arquivo:** `src/pages/Auth.tsx`
+- Remover as `Tabs` (Entrar/Cadastrar) e todo o formulário de cadastro
+- Manter apenas o formulário de login (email + senha)
+- Ajustar título/descrição do card para refletir apenas login
+- Remover estados e handler não usados (`registerName`, `registerEmail`, `registerPassword`, `registerConfirmPassword`, `handleRegister`)
 
--- Criar índice para melhorar performance de consultas por corretor
-CREATE INDEX idx_properties_user_id ON public.properties(user_id);
-```
+**Arquivo:** `src/contexts/AuthContext.tsx`
+- Remover a função `signUp` do contexto (não será mais usada em lugar nenhum)
 
----
-
-### Etapa 3: Vincular Imóveis Existentes ao Usuário
-
-Após você criar a conta, executarei a atribuição dos imóveis:
-
-```sql
--- Atualizar todos os imóveis para pertencerem ao corretor
-UPDATE public.properties
-SET user_id = (
-  SELECT id FROM auth.users 
-  WHERE email = 'icaro.crsilva@gmail.com'
-  LIMIT 1
-);
-```
+Nenhuma alteração no banco, RLS ou rotas.
 
 ---
 
-### Etapa 4: Atualizar RLS para Gestão por Corretor (Opcional)
+### Como Cadastrar Novos Usuários Manualmente
 
-Se desejar que cada corretor veja apenas seus próprios imóveis no painel:
+Você tem duas formas de criar corretores pela plataforma Lovable Cloud (sem precisar do formulário público):
 
-```sql
--- Política: Corretores podem ver apenas seus imóveis
-CREATE POLICY "Corretores veem seus imóveis"
-ON public.properties FOR SELECT
-TO authenticated
-USING (user_id = auth.uid() OR user_id IS NULL);
+1. **Painel Backend do Lovable Cloud** (recomendado)
+   - Abrir o backend pelo botão "View Backend" no chat
+   - Ir em **Users** → **Add user** → informar email e senha
+   - O trigger `handle_new_user` cria o registro em `profiles` automaticamente
+   - Depois, se quiser, atribuir imóveis àquele usuário via update em `properties.user_id`
 
--- Política: Corretores podem editar apenas seus imóveis
-CREATE POLICY "Corretores editam seus imóveis"
-ON public.properties FOR UPDATE
-TO authenticated
-USING (user_id = auth.uid());
-```
+2. **Me pedir aqui no chat**
+   - Basta dizer: "cria o usuário fulano@email.com com senha X" que eu executo o comando de criação e já vinculo aos imóveis que você indicar.
 
 ---
 
-### Resumo das Alterações
+### Sobre "acesso ao banco e chaves KEY"
 
-| Componente | Ação |
-|------------|------|
-| Usuário | Criar conta via formulário de cadastro |
-| `properties` table | Adicionar coluna `user_id` |
-| Dados existentes | UPDATE para vincular ao usuário criado |
-| `types.ts` | Atualizado automaticamente com nova coluna |
+No Lovable Cloud, o banco é gerenciado — algumas chaves são públicas e outras não ficam expostas por segurança:
 
----
+**Disponíveis (já configuradas no projeto):**
+- `VITE_SUPABASE_URL` — URL pública do backend
+- `VITE_SUPABASE_PUBLISHABLE_KEY` (anon key) — chave pública usada no frontend
+- Essas duas já estão no `.env` do projeto e podem ser usadas em qualquer client.
 
-### Fluxo de Execução
+**Não disponíveis no Lovable Cloud:**
+- Senha do banco de dados (Postgres) — não é exposta
+- `SERVICE_ROLE_KEY` — não é acessível (evita uso indevido com privilégio total)
+- Não há painel externo do provedor de banco para acessar diretamente
 
-```text
-┌─────────────────────────────────────────────────────┐
-│  1. Você cria conta no sistema                      │
-│     └─> Email: icaro.crsilva@gmail.com              │
-│     └─> Senha: Marte.1234                           │
-├─────────────────────────────────────────────────────┤
-│  2. Migration adiciona coluna user_id               │
-│     └─> ALTER TABLE properties ADD user_id          │
-├─────────────────────────────────────────────────────┤
-│  3. UPDATE vincula imóveis ao seu usuário           │
-│     └─> UPDATE properties SET user_id = (seu id)    │
-├─────────────────────────────────────────────────────┤
-│  4. (Opcional) RLS restringe acesso por corretor    │
-└─────────────────────────────────────────────────────┘
-```
+**O que você pode usar hoje para gerenciar dados:**
+- **View Backend** (botão no chat): interface para ver/editar tabelas, usuários (Auth), storage, logs
+- **Pedir aqui no chat**: qualquer SELECT/INSERT/UPDATE/migration eu executo com sua aprovação
+- **Export de dados**: Cloud → Advanced settings → Export data (dump completo)
+
+Se precisar de acesso direto via `psql` ou de uma connection string externa, isso exigiria migrar para um Supabase próprio (fora do Cloud gerenciado) — posso explicar esse caminho se quiser.
 
 ---
 
-### Próximos Passos
+### Resumo
 
-1. **Crie sua conta** pelo formulário de cadastro
-2. **Me avise** quando tiver criado a conta
-3. Executarei a migration e o UPDATE para vincular os imóveis
+| Item | Ação |
+|---|---|
+| Aba "Cadastrar" na tela `/login` | Remover |
+| Aba "Entrar" | Manter |
+| `signUp` no AuthContext | Remover |
+| Criação de usuários | Manual via View Backend ou pedindo aqui |
+| Chaves de acesso | Apenas URL + anon key (já no `.env`); service role e senha do DB não disponíveis no Cloud |
