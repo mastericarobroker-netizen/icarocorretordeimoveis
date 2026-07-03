@@ -157,7 +157,7 @@ export function useUpdateProperty() {
 
       const { data, error } = await supabase
         .from('properties')
-        .update(dbUpdates)
+        .update(dbUpdates as never)
         .eq('id', id)
         .select()
         .single();
