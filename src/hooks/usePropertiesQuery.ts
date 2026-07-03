@@ -133,7 +133,7 @@ export function useUpdateProperty() {
 
   return useMutation({
     mutationFn: async ({ id, updates }: { id: string; updates: Partial<Property> }) => {
-      const dbUpdates: Record<string, unknown> = {};
+      const dbUpdates: Record<string, any> = {};
       
       if (updates.title !== undefined) dbUpdates.title = updates.title;
       if (updates.description !== undefined) dbUpdates.description = updates.description;
