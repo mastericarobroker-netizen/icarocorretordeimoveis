@@ -40,5 +40,15 @@ export interface Lead {
   email: string;
   phone: string;
   message: string;
+  status: 'Novo' | 'Tratando' | 'Finalizado';
+  createdAt: string;
+}
+export interface PropertyCapture {
+  id: string;
+  name: string;
+  phone: string;
+  address: string;
+  description: string;
+  status: 'Novo' | 'Tratando' | 'Finalizado';
   createdAt: string;
 }

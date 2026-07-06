@@ -13,6 +13,9 @@ export default {
       },
     },
     extend: {
+      screens: {
+        xs: "400px",
+      },
       fontFamily: {
         sans: ['"Open Sans"', 'system-ui', '-apple-system', 'sans-serif'],
       },

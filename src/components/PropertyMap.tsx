@@ -21,23 +21,21 @@ interface PropertyMapProps {
 }
 
 function createPriceIcon(price: number, listingType: string, isSelected: boolean) {
-  const formatted = listingType === 'rent'
-    ? `R$ ${(price / 1000).toFixed(0)}k`
-    : price >= 1000000
-    ? `R$ ${(price / 1000000).toFixed(1)}M`
-    : `R$ ${(price / 1000).toFixed(0)}k`;
+  const formatted = price >= 1000000
+    ? `${(price / 1000000).toFixed(1)}M`
+    : `${(price / 1000).toFixed(0)}K`;
 
   return L.divIcon({
     className: 'custom-div-icon',
-    html: `<div class="custom-marker" style="background: ${isSelected ? 'hsl(240 11% 18%)' : 'hsl(209 88% 48%)'}">${formatted}</div>`,
-    iconSize: [80, 30],
-    iconAnchor: [40, 15],
+    html: `<div class="custom-marker ${isSelected ? 'selected' : ''}">${formatted}</div>`,
+    iconSize: [60, 24],
+    iconAnchor: [30, 28], // Anchor at bottom center (arrow tip)
   });
 }
 
 function MapEvents({ properties }: { properties: Property[] }) {
   const map = useMap();
-  
+
   useEffect(() => {
     if (properties.length > 0) {
       const bounds = L.latLngBounds(
@@ -81,7 +79,7 @@ export function PropertyMap({
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       <MapEvents properties={properties} />
-      
+
       {properties.map((property) => (
         <Marker
           key={property.id}

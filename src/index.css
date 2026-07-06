@@ -119,12 +119,18 @@
     font-family: 'Open Sans', system-ui, -apple-system, sans-serif;
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     @apply font-semibold tracking-tight;
   }
 }
 
 @layer components {
+
   /* Property Card Styles */
   .property-card {
     @apply bg-card rounded-lg overflow-hidden transition-all duration-200;
@@ -164,21 +170,23 @@
   }
 
   /* Split View Layout */
+  /* Split View Layout */
   .split-view {
-    @apply flex flex-col lg:flex-row h-[calc(100vh-140px)];
+    @apply flex flex-col lg:flex-row flex-1 min-h-0;
   }
 
   .split-view-map {
-    @apply w-full lg:w-[60%] h-[300px] lg:h-full order-2 lg:order-1;
+    @apply w-full h-full lg:w-[55%] xl:w-[60%] order-1 lg:order-1 relative;
   }
 
   .split-view-list {
-    @apply w-full lg:w-[40%] h-auto lg:h-full overflow-y-auto order-1 lg:order-2;
-    @apply bg-secondary/30;
+    @apply w-full lg:w-[45%] xl:w-[40%] flex-1 h-full overflow-y-auto order-2 lg:order-2;
+    @apply bg-background border-l border-border;
   }
 }
 
 @layer utilities {
+
   /* Custom scrollbar */
   .scrollbar-thin {
     scrollbar-width: thin;
@@ -215,13 +223,41 @@
   padding: 0;
 }
 
+/* Marker Styles */
 .custom-marker {
-  background: hsl(var(--primary));
+  @apply relative flex items-center justify-center;
+  background-color: #991b1b;
+  /* Red-800 */
   color: white;
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-weight: 600;
-  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  /* Pill shape */
+  font-weight: 700;
+  font-size: 13px;
   white-space: nowrap;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  border: 1px solid white;
+  transition: all 0.2s ease;
+}
+
+.custom-marker::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 6px solid #991b1b;
+  /* Match background */
+}
+
+.custom-marker.selected {
+  background-color: #000000;
+  z-index: 50 !important;
+  transform: scale(1.1);
+}
+
+.custom-marker.selected::after {
+  border-top-color: #000000;
 }

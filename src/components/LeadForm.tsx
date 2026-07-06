@@ -47,10 +47,10 @@ export function LeadForm({ propertyId, propertyTitle }: LeadFormProps) {
 
   const onSubmit = async (data: LeadFormData) => {
     setIsSubmitting(true);
-    
+
     // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    
+
     addLead({
       name: data.name,
       email: data.email,
@@ -132,7 +132,7 @@ export function LeadForm({ propertyId, propertyTitle }: LeadFormProps) {
                     <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
                       type="tel"
-                      placeholder="(48) 99999-9999"
+                      placeholder="(12) 99196-8709"
                       className="pl-10"
                       {...field}
                     />
@@ -180,11 +180,11 @@ export function LeadForm({ propertyId, propertyTitle }: LeadFormProps) {
           Ou ligue diretamente:
         </p>
         <a
-          href="tel:+5548999999999"
+          href="tel:+5512991968709"
           className="flex items-center justify-center gap-2 mt-2 text-primary font-semibold hover:underline"
         >
           <Phone className="h-4 w-4" />
-          (48) 99999-9999
+          (12) 99196-8709
         </a>
       </div>
     </div>

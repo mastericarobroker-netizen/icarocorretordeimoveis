@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useProperties } from '@/contexts/PropertyContext';
-import { Property } from '@/types/property';
+import { Property, Lead, PropertyCapture } from '@/types/property';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -19,6 +19,13 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import {
   Dialog,
   DialogContent,
@@ -34,6 +41,11 @@ import {
   Home,
   MessageSquare,
   Eye,
+  Clipboard,
+  MoreVertical,
+  CheckCircle2,
+  Clock,
+  AlertCircle,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { ImageUploader } from '@/components/ImageUploader';
@@ -46,7 +58,7 @@ const initialFormData: PropertyFormData = {
   price: 0,
   address: '',
   city: 'Florianópolis',
-  state: 'SC',
+  state: 'SP',
   zipCode: '',
   lat: -27.5969,
   lng: -48.5495,
@@ -61,11 +73,29 @@ const initialFormData: PropertyFormData = {
 };
 
 export default function Admin() {
-  const { properties, leads, addProperty, updateProperty, deleteProperty } = useProperties();
+  const {
+    properties,
+    leads,
+    captures,
+    addProperty,
+    updateProperty,
+    deleteProperty,
+    updateLead,
+    deleteLead,
+    updateCapture,
+    deleteCapture
+  } = useProperties();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingProperty, setEditingProperty] = useState<Property | null>(null);
+
+  const [isLeadDialogOpen, setIsLeadDialogOpen] = useState(false);
+  const [editingLead, setEditingLead] = useState<Lead | null>(null);
+
+  const [isCaptureDialogOpen, setIsCaptureDialogOpen] = useState(false);
+  const [editingCapture, setEditingCapture] = useState<PropertyCapture | null>(null);
+
   const [formData, setFormData] = useState<PropertyFormData>(initialFormData);
-  const [activeTab, setActiveTab] = useState<'properties' | 'leads'>('properties');
+  const [activeTab, setActiveTab] = useState<'properties' | 'leads' | 'captures'>('properties');
   const [featuresInput, setFeaturesInput] = useState('');
 
   const handleOpenDialog = (property?: Property) => {
@@ -127,7 +157,44 @@ export default function Admin() {
   const handleDelete = (id: string) => {
     if (window.confirm('Tem certeza que deseja excluir este imóvel?')) {
       deleteProperty(id);
-      toast.success('Imóvel excluído com sucesso!');
+      toast.success('Imóvel excluído com sucesso');
+    }
+  };
+
+  const handleUpdateLeadStatus = (id: string, status: Lead['status']) => {
+    updateLead(id, { status });
+    toast.success('Status do lead atualizado');
+  };
+
+  const handleDeleteLead = (id: string) => {
+    if (window.confirm('Tem certeza que deseja excluir este lead?')) {
+      deleteLead(id);
+      toast.success('Lead excluído com sucesso');
+    }
+  };
+
+  const handleUpdateCaptureStatus = (id: string, status: PropertyCapture['status']) => {
+    updateCapture(id, { status });
+    toast.success('Status da captação atualizado');
+  };
+
+  const handleDeleteCapture = (id: string) => {
+    if (window.confirm('Tem certeza que deseja excluir esta captação?')) {
+      deleteCapture(id);
+      toast.success('Captação excluída com sucesso');
+    }
+  };
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case 'Novo':
+        return <Badge variant="secondary" className="bg-blue-100 text-blue-700 hover:bg-blue-100"><Clock className="w-3 h-3 mr-1" /> Novo</Badge>;
+      case 'Tratando':
+        return <Badge variant="secondary" className="bg-orange-100 text-orange-700 hover:bg-orange-100"><AlertCircle className="w-3 h-3 mr-1" /> Tratando</Badge>;
+      case 'Finalizado':
+        return <Badge variant="secondary" className="bg-green-100 text-green-700 hover:bg-green-100"><CheckCircle2 className="w-3 h-3 mr-1" /> Finalizado</Badge>;
+      default:
+        return <Badge variant="secondary">{status}</Badge>;
     }
   };
 
@@ -415,137 +482,378 @@ export default function Admin() {
             <MessageSquare className="h-4 w-4 mr-2" />
             Leads ({leads.length})
           </Button>
+          <Button
+            variant={activeTab === 'captures' ? 'default' : 'outline'}
+            onClick={() => setActiveTab('captures')}
+          >
+            <Clipboard className="h-4 w-4 mr-2" />
+            Captação ({captures.length})
+          </Button>
         </div>
 
         {/* Properties Table */}
         {activeTab === 'properties' && (
           <div className="bg-card rounded-lg border border-border overflow-hidden">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Imóvel</TableHead>
-                  <TableHead>Tipo</TableHead>
-                  <TableHead>Preço</TableHead>
-                  <TableHead>Cidade</TableHead>
-                  <TableHead className="text-right">Ações</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {properties.map((property) => (
-                  <TableRow key={property.id}>
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <img
-                          src={property.images[0]}
-                          alt={property.title}
-                          className="w-16 h-12 object-cover rounded"
-                        />
-                        <div>
-                          <p className="font-medium text-foreground line-clamp-1">
-                            {property.title}
-                          </p>
-                          <p className="text-sm text-muted-foreground">
-                            {property.bedrooms} quartos • {property.area} m²
-                          </p>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Imóvel</TableHead>
+                    <TableHead>Tipo</TableHead>
+                    <TableHead>Preço</TableHead>
+                    <TableHead>Cidade</TableHead>
+                    <TableHead className="text-right">Ações</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {properties.map((property) => (
+                    <TableRow key={property.id}>
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <img
+                            src={property.images[0]}
+                            alt={property.title}
+                            className="w-16 h-12 object-cover rounded"
+                          />
+                          <div>
+                            <p className="font-medium text-foreground line-clamp-1">
+                              {property.title}
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              {property.bedrooms} quartos • {property.area} m²
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <span
-                        className={`px-2 py-1 text-xs font-medium rounded ${
-                          property.listingType === 'sale'
+                      </TableCell>
+                      <TableCell>
+                        <span
+                          className={`px-2 py-1 text-xs font-medium rounded ${property.listingType === 'sale'
                             ? 'bg-success/10 text-success'
                             : 'bg-warning/10 text-warning'
-                        }`}
-                      >
-                        {property.listingType === 'sale' ? 'Venda' : 'Aluguel'}
-                      </span>
-                    </TableCell>
-                    <TableCell className="font-medium">
-                      {formatPrice(property.price)}
-                    </TableCell>
-                    <TableCell>{property.city}</TableCell>
-                    <TableCell>
-                      <div className="flex justify-end gap-2">
-                        <Link to={`/imovel/${property.id}`}>
-                          <Button variant="ghost" size="sm">
-                            <Eye className="h-4 w-4" />
+                            }`}
+                        >
+                          {property.listingType === 'sale' ? 'Venda' : 'Aluguel'}
+                        </span>
+                      </TableCell>
+                      <TableCell className="font-medium">
+                        {formatPrice(property.price)}
+                      </TableCell>
+                      <TableCell>{property.city}</TableCell>
+                      <TableCell>
+                        <div className="flex justify-end gap-2">
+                          <Link to={`/imovel/${property.id}`}>
+                            <Button variant="ghost" size="sm">
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                          </Link>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleOpenDialog(property)}
+                          >
+                            <Pencil className="h-4 w-4" />
                           </Button>
-                        </Link>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleOpenDialog(property)}
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDelete(property.id)}
-                          className="text-destructive hover:text-destructive"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDelete(property.id)}
+                            className="text-destructive hover:text-destructive"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           </div>
         )}
 
         {/* Leads Table */}
         {activeTab === 'leads' && (
           <div className="bg-card rounded-lg border border-border overflow-hidden">
-            {leads.length > 0 ? (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Nome</TableHead>
-                    <TableHead>Contato</TableHead>
-                    <TableHead>Mensagem</TableHead>
-                    <TableHead>Data</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {leads.map((lead) => (
-                    <TableRow key={lead.id}>
-                      <TableCell className="font-medium">{lead.name}</TableCell>
-                      <TableCell>
-                        <div>
-                          <p className="text-sm">{lead.email}</p>
-                          <p className="text-sm text-muted-foreground">
-                            {lead.phone}
-                          </p>
-                        </div>
-                      </TableCell>
-                      <TableCell className="max-w-xs">
-                        <p className="line-clamp-2 text-sm text-muted-foreground">
-                          {lead.message}
-                        </p>
-                      </TableCell>
-                      <TableCell className="text-sm text-muted-foreground">
-                        {new Date(lead.createdAt).toLocaleDateString('pt-BR')}
-                      </TableCell>
+            <div className="overflow-x-auto">
+              {leads.length > 0 ? (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Nome</TableHead>
+                      <TableHead>Contato</TableHead>
+                      <TableHead>Mensagem</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Data</TableHead>
+                      <TableHead className="w-[100px]">Ações</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            ) : (
-              <div className="p-12 text-center">
-                <MessageSquare className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                <h3 className="text-lg font-medium text-foreground mb-2">
-                  Nenhum lead recebido ainda
-                </h3>
-                <p className="text-muted-foreground">
-                  Os contatos dos interessados aparecerão aqui.
-                </p>
-              </div>
-            )}
+                  </TableHeader>
+                  <TableBody>
+                    {leads.map((lead) => (
+                      <TableRow key={lead.id}>
+                        <TableCell className="font-medium text-foreground">{lead.name}</TableCell>
+                        <TableCell>
+                          <div>
+                            <p className="text-sm">{lead.email}</p>
+                            <p className="text-sm text-muted-foreground">
+                              {lead.phone}
+                            </p>
+                          </div>
+                        </TableCell>
+                        <TableCell className="max-w-xs">
+                          <p className="line-clamp-2 text-sm text-muted-foreground">
+                            {lead.message}
+                          </p>
+                        </TableCell>
+                        <TableCell>
+                          <Select
+                            value={lead.status}
+                            onValueChange={(value: any) => handleUpdateLeadStatus(lead.id, value)}
+                          >
+                            <SelectTrigger className="w-[130px] h-8 text-xs">
+                              <SelectValue placeholder="Status" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="Novo">Novo</SelectItem>
+                              <SelectItem value="Tratando">Tratando</SelectItem>
+                              <SelectItem value="Finalizado">Finalizado</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </TableCell>
+                        <TableCell className="text-sm text-muted-foreground whitespace-nowrap">
+                          {new Date(lead.createdAt).toLocaleDateString('pt-BR')}
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => {
+                                setEditingLead(lead);
+                                setIsLeadDialogOpen(true);
+                              }}
+                            >
+                              <Pencil className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="text-destructive h-8 w-8"
+                              onClick={() => handleDeleteLead(lead.id)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              ) : (
+                <div className="p-12 text-center">
+                  <MessageSquare className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                  <h3 className="text-lg font-medium text-foreground mb-2">
+                    Nenhum lead recebido ainda
+                  </h3>
+                  <p className="text-muted-foreground">
+                    Os contatos dos interessados aparecerão aqui.
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
         )}
+        {/* Captures Table */}
+        {activeTab === 'captures' && (
+          <div className="bg-card rounded-lg border border-border overflow-hidden">
+            <div className="overflow-x-auto">
+              {captures.length > 0 ? (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Proprietário</TableHead>
+                      <TableHead>Telefone</TableHead>
+                      <TableHead>Endereço do Imóvel</TableHead>
+                      <TableHead>Descrição</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Data</TableHead>
+                      <TableHead className="w-[100px]">Ações</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {captures.map((capture) => (
+                      <TableRow key={capture.id}>
+                        <TableCell className="font-medium text-foreground">{capture.name}</TableCell>
+                        <TableCell>
+                          <p className="text-sm">{capture.phone}</p>
+                        </TableCell>
+                        <TableCell>
+                          <p className="text-sm text-muted-foreground">{capture.address}</p>
+                        </TableCell>
+                        <TableCell className="max-w-xs">
+                          <p className="line-clamp-2 text-sm text-muted-foreground">
+                            {capture.description}
+                          </p>
+                        </TableCell>
+                        <TableCell>
+                          <Select
+                            value={capture.status}
+                            onValueChange={(value: any) => handleUpdateCaptureStatus(capture.id, value)}
+                          >
+                            <SelectTrigger className="w-[130px] h-8 text-xs">
+                              <SelectValue placeholder="Status" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="Novo">Novo</SelectItem>
+                              <SelectItem value="Tratando">Tratando</SelectItem>
+                              <SelectItem value="Finalizado">Finalizado</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </TableCell>
+                        <TableCell className="text-sm text-muted-foreground whitespace-nowrap">
+                          {new Date(capture.createdAt).toLocaleDateString('pt-BR')}
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => {
+                                setEditingCapture(capture);
+                                setIsCaptureDialogOpen(true);
+                              }}
+                            >
+                              <Pencil className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="text-destructive h-8 w-8"
+                              onClick={() => handleDeleteCapture(capture.id)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              ) : (
+                <div className="p-12 text-center">
+                  <Clipboard className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                  <h3 className="text-lg font-medium text-foreground mb-2">
+                    Nenhuma captação recebida ainda
+                  </h3>
+                  <p className="text-muted-foreground">
+                    As solicitações de anúncios de proprietários aparecerão aqui.
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Edit Lead Dialog */}
+        <Dialog open={isLeadDialogOpen} onOpenChange={setIsLeadDialogOpen}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Editar Lead</DialogTitle>
+            </DialogHeader>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (editingLead) {
+                  updateLead(editingLead.id, editingLead);
+                  toast.success('Lead atualizado com sucesso');
+                  setIsLeadDialogOpen(false);
+                }
+              }}
+              className="space-y-4"
+            >
+              <div>
+                <label className="text-sm font-medium">Nome</label>
+                <Input
+                  value={editingLead?.name || ''}
+                  onChange={(e) => setEditingLead(editingLead ? { ...editingLead, name: e.target.value } : null)}
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium">Email</label>
+                <Input
+                  value={editingLead?.email || ''}
+                  onChange={(e) => setEditingLead(editingLead ? { ...editingLead, email: e.target.value } : null)}
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium">Telefone</label>
+                <Input
+                  value={editingLead?.phone || ''}
+                  onChange={(e) => setEditingLead(editingLead ? { ...editingLead, phone: e.target.value } : null)}
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium">Mensagem</label>
+                <Textarea
+                  value={editingLead?.message || ''}
+                  onChange={(e) => setEditingLead(editingLead ? { ...editingLead, message: e.target.value } : null)}
+                  rows={4}
+                />
+              </div>
+              <Button type="submit" className="w-full">Salvar Alterações</Button>
+            </form>
+          </DialogContent>
+        </Dialog>
+
+        {/* Edit Capture Dialog */}
+        <Dialog open={isCaptureDialogOpen} onOpenChange={setIsCaptureDialogOpen}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Editar Captação</DialogTitle>
+            </DialogHeader>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (editingCapture) {
+                  updateCapture(editingCapture.id, editingCapture);
+                  toast.success('Captação atualizada com sucesso');
+                  setIsCaptureDialogOpen(false);
+                }
+              }}
+              className="space-y-4"
+            >
+              <div>
+                <label className="text-sm font-medium">Nome do Proprietário</label>
+                <Input
+                  value={editingCapture?.name || ''}
+                  onChange={(e) => setEditingCapture(editingCapture ? { ...editingCapture, name: e.target.value } : null)}
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium">Telefone</label>
+                <Input
+                  value={editingCapture?.phone || ''}
+                  onChange={(e) => setEditingCapture(editingCapture ? { ...editingCapture, phone: e.target.value } : null)}
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium">Endereço</label>
+                <Input
+                  value={editingCapture?.address || ''}
+                  onChange={(e) => setEditingCapture(editingCapture ? { ...editingCapture, address: e.target.value } : null)}
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium">Descrição</label>
+                <Textarea
+                  value={editingCapture?.description || ''}
+                  onChange={(e) => setEditingCapture(editingCapture ? { ...editingCapture, description: e.target.value } : null)}
+                  rows={4}
+                />
+              </div>
+              <Button type="submit" className="w-full">Salvar Alterações</Button>
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
