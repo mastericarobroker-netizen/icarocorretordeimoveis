@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
 import { Home, Loader2, Mail, Lock, User } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { getAuthErrorMessage, validatePassword } from '@/lib/auth-utils';
 
 export default function Auth() {
   const navigate = useNavigate();
@@ -31,7 +32,7 @@ export default function Auth() {
     const { error } = await signIn(loginEmail, loginPassword);
     
     if (error) {
-      toast.error('Erro ao fazer login: ' + error.message);
+      toast.error(getAuthErrorMessage(error, 'Erro ao fazer login.'));
     } else {
       toast.success('Login realizado com sucesso!');
       navigate('/admin');
@@ -48,8 +49,9 @@ export default function Auth() {
       return;
     }
 
-    if (registerPassword.length < 6) {
-      toast.error('A senha deve ter pelo menos 6 caracteres');
+    const passwordValidation = validatePassword(registerPassword);
+    if (!passwordValidation.valid) {
+      toast.error(passwordValidation.message || 'A senha não atende aos requisitos de segurança.');
       return;
     }
 
@@ -58,10 +60,10 @@ export default function Auth() {
     const { error } = await signUp(registerEmail, registerPassword, registerName);
     
     if (error) {
-      toast.error('Erro ao criar conta: ' + error.message);
+      toast.error(getAuthErrorMessage(error, 'Erro ao criar conta.'));
     } else {
-      toast.success('Conta criada com sucesso! Você já pode acessar.');
-      navigate('/admin');
+      toast.success('Conta criada com sucesso! Faça login para acessar o painel.');
+      navigate('/login');
     }
     
     setIsLoading(false);
@@ -169,7 +171,7 @@ export default function Auth() {
                       <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                       <Input
                         type="password"
-                        placeholder="Senha (mín. 6 caracteres)"
+                        placeholder="Senha forte (mín. 8 caracteres)"
                         value={registerPassword}
                         onChange={(e) => setRegisterPassword(e.target.value)}
                         className="pl-10"
