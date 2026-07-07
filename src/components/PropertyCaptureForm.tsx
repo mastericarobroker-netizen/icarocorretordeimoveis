@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useProperties } from '@/contexts/PropertyContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -9,8 +8,9 @@ interface PropertyCaptureFormProps {
     onSuccess?: () => void;
 }
 
+const WHATSAPP_NUMBER = '5512991968709'; // +55 12 99196-8709
+
 export function PropertyCaptureForm({ onSuccess }: PropertyCaptureFormProps) {
-    const { addCapture } = useProperties();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [formData, setFormData] = useState({
         name: '',
@@ -24,8 +24,15 @@ export function PropertyCaptureForm({ onSuccess }: PropertyCaptureFormProps) {
         setIsSubmitting(true);
 
         try {
-            await addCapture(formData);
-            toast.success('Solicitação enviada com sucesso! Entraremos em contato em breve.');
+            // Format message for WhatsApp
+            const message = `*Novo Anúncio de Imóvel*\n\n*Nome:* ${formData.name}\n*Telefone:* ${formData.phone}\n*Endereço:* ${formData.address}\n*Descrição:* ${formData.description}`;
+            const encodedMessage = encodeURIComponent(message);
+            const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMessage}`;
+
+            // Open WhatsApp
+            window.open(whatsappUrl, '_blank');
+            
+            toast.success('Redirecionando para WhatsApp...');
             setFormData({
                 name: '',
                 phone: '',
@@ -34,8 +41,8 @@ export function PropertyCaptureForm({ onSuccess }: PropertyCaptureFormProps) {
             });
             onSuccess?.();
         } catch (error) {
-            console.error('Error submitting capture:', error);
-            toast.error('Ocorreu um erro ao enviar sua solicitação. Tente novamente.');
+            console.error('Error opening WhatsApp:', error);
+            toast.error('Erro ao abrir WhatsApp. Tente novamente.');
         } finally {
             setIsSubmitting(false);
         }
