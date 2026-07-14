@@ -1,7 +1,7 @@
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Navigate, Routes, Route } from "react-router-dom";
 import { PropertyProvider } from "@/contexts/PropertyContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { Navbar } from "@/components/Navbar";
@@ -25,7 +25,8 @@ const App = () => (
           <BrowserRouter>
             <Navbar />
             <Routes>
-              <Route path="/" element={<Index />} />
+              <Route path="/" element={<Navigate to="/buscar?type=sale" replace />} />
+              <Route path="/home" element={<Index />} />
               <Route path="/buscar" element={<Search />} />
               <Route path="/imovel/:id" element={<PropertyDetails />} />
               <Route path="/login" element={<Auth />} />

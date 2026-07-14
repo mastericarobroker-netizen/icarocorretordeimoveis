@@ -22,7 +22,7 @@ export function Navbar() {
   const handleSignOut = async () => {
     await signOut();
     toast.success('Logout realizado com sucesso!');
-    navigate('/');
+    navigate('/buscar?type=sale');
     setMobileMenuOpen(false);
   };
 
@@ -40,7 +40,7 @@ export function Navbar() {
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2">
+          <Link to="/home" className="flex items-center gap-2">
             <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary">
               <Home className="h-5 w-5 text-primary-foreground" />
             </div>
