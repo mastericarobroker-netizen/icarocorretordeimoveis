@@ -22,9 +22,17 @@ import { toast } from 'sonner';
 
 export default function PropertyDetails() {
   const { id } = useParams<{ id: string }>();
-  const { getPropertyById } = useProperties();
+  const { getPropertyById, isLoading } = useProperties();
 
   const property = id ? getPropertyById(id) : undefined;
+
+  if (isLoading) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center" role="status" aria-live="polite">
+        <p className="text-muted-foreground">Carregando anúncio...</p>
+      </div>
+    );
+  }
 
   if (!property) {
     return (
@@ -33,7 +41,7 @@ export default function PropertyDetails() {
           <h1 className="text-2xl font-bold text-foreground mb-4">
             Imóvel não encontrado
           </h1>
-          <Link to={property.listingType === 'auction' ? '/buscar?type=auction' : `/buscar?type=${property.listingType}`}>
+          <Link to="/buscar?type=sale">
             <Button>Voltar para busca</Button>
           </Link>
         </div>
