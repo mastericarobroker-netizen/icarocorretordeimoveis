@@ -50,6 +50,7 @@ import {
 import { Link } from 'react-router-dom';
 import { ImageUploader } from '@/components/ImageUploader';
 import { getYouTubeVideoId } from '@/lib/youtube';
+import { HomepagePropertyCardsManager } from '@/components/HomepagePropertyCardsManager';
 
 type PropertyFormData = Omit<Property, 'id' | 'createdAt' | 'updatedAt'>;
 
@@ -524,6 +525,8 @@ export default function Admin() {
             </DialogContent>
           </Dialog>
         </div>
+
+        <HomepagePropertyCardsManager properties={properties} />
 
         {/* Tabs */}
         <div className="flex gap-2 mb-6">

@@ -14,6 +14,32 @@ export type Database = {
   }
   public: {
     Tables: {
+      homepage_property_cards: {
+        Row: {
+          created_at: string
+          position: number
+          property_id: string
+        }
+        Insert: {
+          created_at?: string
+          position: number
+          property_id: string
+        }
+        Update: {
+          created_at?: string
+          position?: number
+          property_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "homepage_property_cards_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: true
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       leads: {
         Row: {
           created_at: string
@@ -168,10 +194,30 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      homepage_property_cards_public: {
+        Row: {
+          area: number
+          auction_modality: string | null
+          bathrooms: number
+          bedrooms: number
+          city: string
+          images: string[] | null
+          listing_type: string
+          position: number
+          price: number
+          property_id: string
+          state: string
+          title: string
+          type: string
+        }
+        Relationships: []
+      }
     }
     Functions: {
-      [_ in never]: never
+      set_homepage_property_cards: {
+        Args: { property_ids: string[] }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
