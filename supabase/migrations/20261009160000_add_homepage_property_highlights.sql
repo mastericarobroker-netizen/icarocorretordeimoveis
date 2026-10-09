@@ -71,7 +71,8 @@ BEGIN
     RAISE EXCEPTION 'Select at most four distinct properties';
   END IF;
 
-  DELETE FROM public.homepage_property_cards;
+  DELETE FROM public.homepage_property_cards
+  WHERE position BETWEEN 1 AND 4;
 
   INSERT INTO public.homepage_property_cards (position, property_id)
   SELECT selected.ordinality::SMALLINT, selected.id
