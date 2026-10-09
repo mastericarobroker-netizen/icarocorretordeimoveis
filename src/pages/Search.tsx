@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useProperties } from '@/contexts/PropertyContext';
 import { PropertyCard } from '@/components/PropertyCard';
@@ -7,141 +7,129 @@ import { FilterBar } from '@/components/FilterBar';
 import { SearchBar } from '@/components/SearchBar';
 import { Property } from '@/types/property';
 import { Button } from '@/components/ui/button';
-import { Map, List } from 'lucide-react';
+import { Map, List, Search as SearchIcon, ArrowUpDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export default function Search() {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const [viewMode, setViewMode] = useState<'list' | 'map'>('map');
-  const {
-    filteredProperties,
-    setFilters,
-    setSearchQuery,
-    selectedProperty,
-    setSelectedProperty,
-  } = useProperties();
+  const { filteredProperties, setFilters, setSearchQuery, searchQuery, selectedProperty, setSelectedProperty } = useProperties();
 
-  // Handle URL parameters
   useEffect(() => {
-    const query = searchParams.get('q');
     const type = searchParams.get('type');
+    const minPrice = searchParams.get('minPrice');
+    const maxPrice = searchParams.get('maxPrice');
+    const beds = searchParams.get('beds');
+    const baths = searchParams.get('baths');
+    const propertyType = searchParams.get('propertyType');
+    const minArea = searchParams.get('minArea');
+    const maxArea = searchParams.get('maxArea');
+    const parking = searchParams.get('parking');
+    const city = searchParams.get('city');
+    const query = searchParams.get('q') || '';
 
-    if (query) {
-      setSearchQuery(query);
-    }
-
-    if (type === 'sale' || type === 'rent') {
-      setFilters({ listingType: type });
-    }
+    setSearchQuery(query);
+    setFilters({
+      listingType: type === 'rent' ? 'rent' : 'sale',
+      ...(minPrice ? { minPrice: Number(minPrice) } : {}),
+      ...(maxPrice ? { maxPrice: Number(maxPrice) } : {}),
+      ...(beds ? { bedrooms: Number(beds) } : {}),
+      ...(baths ? { bathrooms: Number(baths) } : {}),
+      ...(propertyType ? { type: propertyType as Property['type'] } : {}),
+      ...(minArea ? { minArea: Number(minArea) } : {}),
+      ...(maxArea ? { maxArea: Number(maxArea) } : {}),
+      ...(parking ? { parking: Number(parking) } : {}),
+      ...(city ? { city } : {}),
+    });
   }, [searchParams, setFilters, setSearchQuery]);
+
+  const sort = searchParams.get('sort') || 'recommended';
+  const properties = useMemo(() => {
+    const results = [...filteredProperties];
+    if (sort === 'price-asc') results.sort((a, b) => a.price - b.price);
+    if (sort === 'price-desc') results.sort((a, b) => b.price - a.price);
+    if (sort === 'newest') results.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    if (sort === 'area-desc') results.sort((a, b) => b.area - a.area);
+    return results;
+  }, [filteredProperties, sort]);
 
   const handleMarkerClick = (property: Property) => {
     setSelectedProperty(property);
-    setViewMode('list'); // Switch to list to see the highlighted card
-    // Scroll to property card on mobile
+    setViewMode('list');
     const element = document.getElementById(`property-${property.id}`);
-    if (element) {
-      setTimeout(() => {
-        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }, 100);
-    }
+    if (element) setTimeout(() => element.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
   };
 
-  const handlePropertyHover = (property: Property | null) => {
-    setSelectedProperty(property);
+  const handleSort = (value: string) => {
+    const next = new URLSearchParams(searchParams);
+    if (value === 'recommended') next.delete('sort');
+    else next.set('sort', value);
+    setSearchParams(next, { replace: true });
   };
 
   return (
-    <div className="h-[calc(100vh-64px)] flex flex-col overflow-hidden">
-      {/* Search Header Container */}
-      <div className="flex-none bg-card z-10 shadow-sm">
-        <div className="border-b border-border p-4">
-          <div className="container mx-auto">
-            <SearchBar
-              onSearch={(query) => {
-                setSearchQuery(query);
-                navigate(`/buscar?q=${encodeURIComponent(query)}`);
-              }}
-            />
-          </div>
+    <main className="search-page">
+      <div className="search-topbar">
+        <div className="search-input-wrap">
+          <SearchBar onSearch={(query) => {
+            const next = new URLSearchParams(searchParams);
+            if (query.trim()) next.set('q', query.trim()); else next.delete('q');
+            setSearchQuery(query.trim());
+            setSearchParams(next);
+          }} />
         </div>
-
-        {/* Filters */}
         <FilterBar />
-
-        {/* Results Count */}
-        <div className="border-b border-border px-4 py-3 bg-secondary/10">
-          <div className="container mx-auto">
-            <p className="text-sm text-muted-foreground">
-              <span className="font-semibold text-foreground">
-                {filteredProperties.length}
-              </span>{' '}
-              imóveis encontrados
-            </p>
-          </div>
-        </div>
       </div>
 
-      {/* Split View Layout */}
-      <div className="split-view relative flex-1">
-        {/* Map */}
-        <div className={cn(
-          "split-view-map",
-          viewMode === 'list' ? "hidden lg:block" : "block"
-        )}>
-          <PropertyMap
-            properties={filteredProperties}
-            onMarkerClick={handleMarkerClick}
-          />
+      <section className="search-workspace" aria-label="Resultados de imóveis">
+        <div className={cn('search-map-pane', viewMode === 'list' ? 'mobile-hidden' : '')}>
+          <PropertyMap properties={properties} onMarkerClick={handleMarkerClick} />
+          <div className="map-result-pill">{properties.length.toLocaleString('pt-BR')} imóveis nesta busca</div>
         </div>
 
-        {/* Property List */}
-        <div className={cn(
-          "split-view-list scrollbar-thin",
-          viewMode === 'map' ? "hidden lg:block" : "block"
-        )}>
-          {filteredProperties.length > 0 ? (
-            <div className="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-4">
-              {filteredProperties.map((property) => (
+        <div className={cn('search-results-pane', viewMode === 'map' ? 'mobile-hidden' : '')}>
+          <div className="results-heading">
+            <div>
+              <p className="results-eyebrow">Explore imóveis</p>
+              <h1>{searchQuery ? `Imóveis em ${searchQuery}` : 'Imóveis para encontrar seu próximo capítulo'}</h1>
+              <p className="results-count"><strong>{properties.length.toLocaleString('pt-BR')}</strong> resultados disponíveis</p>
+            </div>
+            <label className="sort-control"><ArrowUpDown size={15} /><span className="sr-only">Ordenar por</span>
+              <select value={sort} onChange={(e) => handleSort(e.target.value)} aria-label="Ordenar imóveis">
+                <option value="recommended">Relevância</option>
+                <option value="newest">Mais recentes</option>
+                <option value="price-asc">Menor preço</option>
+                <option value="price-desc">Maior preço</option>
+                <option value="area-desc">Maior área</option>
+              </select>
+            </label>
+          </div>
+
+          {properties.length > 0 ? (
+            <div className="property-results-grid">
+              {properties.map((property) => (
                 <div key={property.id} id={`property-${property.id}`}>
-                  <PropertyCard
-                    property={property}
-                    isSelected={selectedProperty?.id === property.id}
-                    onHover={handlePropertyHover}
-                  />
+                  <PropertyCard property={property} isSelected={selectedProperty?.id === property.id} onHover={setSelectedProperty} />
                 </div>
               ))}
             </div>
           ) : (
-            <div className="flex flex-col items-center justify-center h-full p-8 text-center bg-background">
-              <div className="w-16 h-16 bg-secondary rounded-full flex items-center justify-center mb-4">
-                <span className="text-3xl">🏠</span>
-              </div>
-              <h3 className="text-xl font-semibold text-foreground mb-2">
-                Nenhum imóvel encontrado
-              </h3>
-              <p className="text-muted-foreground">
-                Tente ajustar os filtros ou buscar por outra região.
-              </p>
+            <div className="empty-results">
+              <span className="empty-results-icon"><SearchIcon size={22} /></span>
+              <h2>Nenhum imóvel encontrado</h2>
+              <p>Tente ampliar a região ou remover algum filtro para ver mais opções.</p>
+              <Button variant="outline" onClick={() => navigate('/buscar?type=sale')}>Ver todos à venda</Button>
             </div>
           )}
         </div>
 
-        {/* Floating Toggle Button (Mobile Only) */}
-        <div className="lg:hidden fixed bottom-24 left-1/2 -translate-x-1/2 z-40">
-          <Button
-            onClick={() => setViewMode(viewMode === 'map' ? 'list' : 'map')}
-            className="rounded-full shadow-lg bg-foreground text-background hover:bg-foreground/90 px-6 h-12 flex items-center gap-2 border-2 border-background/20"
-          >
-            {viewMode === 'map' ? (
-              <><List className="w-4 h-4" /> Ver Lista</>
-            ) : (
-              <><Map className="w-4 h-4" /> Ver Mapa</>
-            )}
+        <div className="mobile-view-toggle">
+          <Button onClick={() => setViewMode(viewMode === 'map' ? 'list' : 'map')} className="toggle-view-button">
+            {viewMode === 'map' ? <><List size={17} /> Ver lista</> : <><Map size={17} /> Ver mapa</>}
           </Button>
         </div>
-      </div>
-    </div>
+      </section>
+    </main>
   );
 }

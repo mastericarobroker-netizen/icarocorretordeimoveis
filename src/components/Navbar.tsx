@@ -40,12 +40,12 @@ export function Navbar() {
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
-          <Link to="/home" className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary">
+          <Link to="/buscar?type=sale" className="flex items-center gap-2.5">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary">
               <Home className="h-5 w-5 text-primary-foreground" />
             </div>
             <span className="text-xl font-bold text-foreground truncate sm:max-w-none">
-              Ícaro Corretor
+              Ícaro
               <span className="hidden xs:inline"> de Imóveis</span>
             </span>
           </Link>

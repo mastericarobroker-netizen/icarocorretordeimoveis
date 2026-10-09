@@ -1,0 +1,1 @@
+{"routes":[{"path":"/","title":"Buscar imóveis"},{"path":"/home","title":"Busca de imóveis"},{"path":"/buscar","title":"Busca de imóveis"},{"path":"/imovel/:id","title":"Detalhes do imóvel"},{"path":"/login","title":"Acesso do corretor"},{"path":"/admin","title":"Painel do corretor"}]}

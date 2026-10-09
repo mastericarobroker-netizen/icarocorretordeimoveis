@@ -7,7 +7,6 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { Navbar } from "@/components/Navbar";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
-import Index from "./pages/Index";
 import Search from "./pages/Search";
 import PropertyDetails from "./pages/PropertyDetails";
 import Admin from "./pages/Admin";
@@ -26,7 +25,7 @@ const App = () => (
             <Navbar />
             <Routes>
               <Route path="/" element={<Navigate to="/buscar?type=sale" replace />} />
-              <Route path="/home" element={<Index />} />
+              <Route path="/home" element={<Navigate to="/buscar?type=sale" replace />} />
               <Route path="/buscar" element={<Search />} />
               <Route path="/imovel/:id" element={<PropertyDetails />} />
               <Route path="/login" element={<Auth />} />
