@@ -31,7 +31,7 @@ export default function Search() {
 
     setSearchQuery(query);
     setFilters({
-      listingType: type === 'rent' ? 'rent' : 'sale',
+      listingType: type === 'rent' ? 'rent' : type === 'auction' ? 'auction' : 'sale',
       ...(minPrice ? { minPrice: Number(minPrice) } : {}),
       ...(maxPrice ? { maxPrice: Number(maxPrice) } : {}),
       ...(beds ? { bedrooms: Number(beds) } : {}),
@@ -91,8 +91,8 @@ export default function Search() {
         <div className={cn('search-results-pane', viewMode === 'map' ? 'mobile-hidden' : '')}>
           <div className="results-heading">
             <div>
-              <p className="results-eyebrow">Explore imóveis</p>
-              <h1>{searchQuery ? `Imóveis em ${searchQuery}` : 'Imóveis para encontrar seu próximo capítulo'}</h1>
+              <p className="results-eyebrow">{searchParams.get('type') === 'auction' ? 'Oportunidades em leilão' : 'Explore imóveis'}</p>
+              <h1>{searchQuery ? `Imóveis em ${searchQuery}` : searchParams.get('type') === 'auction' ? 'Imóveis em Leilão' : 'Imóveis para encontrar seu próximo capítulo'}</h1>
               <p className="results-count"><strong>{properties.length.toLocaleString('pt-BR')}</strong> resultados disponíveis</p>
             </div>
             <label className="sort-control"><ArrowUpDown size={15} /><span className="sr-only">Ordenar por</span>
@@ -117,9 +117,11 @@ export default function Search() {
           ) : (
             <div className="empty-results">
               <span className="empty-results-icon"><SearchIcon size={22} /></span>
-              <h2>Nenhum imóvel encontrado</h2>
-              <p>Tente ampliar a região ou remover algum filtro para ver mais opções.</p>
-              <Button variant="outline" onClick={() => navigate('/buscar?type=sale')}>Ver todos à venda</Button>
+              <h2>{searchParams.get('type') === 'auction' ? 'Ainda não há imóveis em leilão' : 'Nenhum imóvel encontrado'}</h2>
+              <p>{searchParams.get('type') === 'auction' ? 'Novos anúncios de leilão aparecerão aqui assim que forem cadastrados.' : 'Tente ampliar a região ou remover algum filtro para ver mais opções.'}</p>
+              <Button variant="outline" onClick={() => navigate(searchParams.get('type') === 'auction' ? '/buscar?type=sale' : `/buscar?type=${searchParams.get('type') === 'rent' ? 'rent' : 'sale'}`)}>
+                {searchParams.get('type') === 'auction' ? 'Ver imóveis à venda' : searchParams.get('type') === 'rent' ? 'Ver todos para alugar' : 'Ver todos à venda'}
+              </Button>
             </div>
           )}
         </div>

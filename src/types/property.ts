@@ -13,7 +13,7 @@ export interface Property {
   bathrooms: number;
   area: number; // sqft
   type: 'house' | 'apartment' | 'condo' | 'land';
-  listingType: 'sale' | 'rent';
+  listingType: 'sale' | 'rent' | 'auction';
   images: string[];
   features: string[];
   yearBuilt?: number;

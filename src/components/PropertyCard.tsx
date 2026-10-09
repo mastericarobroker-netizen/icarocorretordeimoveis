@@ -26,6 +26,12 @@ export function PropertyCard({
     return listingType === 'rent' ? `${formatted}/mês` : formatted;
   };
 
+  const listingLabels: Record<Property['listingType'], string> = {
+    sale: 'Venda',
+    rent: 'Aluguel',
+    auction: 'Leilão',
+  };
+
   const typeLabels: Record<Property['type'], string> = {
     house: 'Casa',
     apartment: 'Apartamento',
@@ -61,7 +67,7 @@ export function PropertyCard({
                   : 'bg-white/90 text-foreground'
               )}
             >
-              {property.listingType === 'sale' ? 'Venda' : 'Aluguel'}
+              {listingLabels[property.listingType]}
             </span>
           </div>
         </div>
@@ -71,6 +77,7 @@ export function PropertyCard({
           <div>
             <div className="flex justify-between items-start">
               <p className="text-xl font-bold text-foreground">
+                {property.listingType === 'auction' && <span className="block text-xs font-semibold text-muted-foreground">Lance inicial</span>}
                 {formatPrice(property.price, property.listingType)}
               </p>
             </div>
@@ -144,6 +151,7 @@ export function PropertyCard({
         {/* Price */}
         <div className="flex items-baseline justify-between">
           <p className="text-2xl font-bold text-foreground tracking-tight">
+            {property.listingType === 'auction' && <span className="block text-xs font-semibold text-muted-foreground">Lance inicial</span>}
             {formatPrice(property.price, property.listingType)}
           </p>
         </div>
@@ -165,7 +173,7 @@ export function PropertyCard({
 
             <span className="mx-2 text-muted-foreground">-</span>
             <span className="truncate text-muted-foreground">
-              {typeLabels[property.type]} para {property.listingType === 'sale' ? 'venda' : 'aluguel'}
+              {typeLabels[property.type]} {property.listingType === 'sale' ? 'para venda' : property.listingType === 'rent' ? 'para aluguel' : 'em leilão'}
             </span>
           </div>
         )}

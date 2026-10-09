@@ -104,6 +104,7 @@ export function PropertyMap({
                 className="w-full h-32 object-cover rounded-t"
               />
               <div className="p-3">
+                {property.listingType === 'auction' && <p className="text-xs font-semibold text-muted-foreground">Lance inicial</p>}
                 <p className="text-lg font-bold text-foreground">
                   {formatPrice(property.price, property.listingType)}
                 </p>

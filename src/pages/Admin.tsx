@@ -267,7 +267,7 @@ export default function Admin() {
                   </div>
 
                   <div>
-                    <label className="text-sm font-medium">Tipo de Oferta</label>
+                    <label className="text-sm font-medium">Modalidade</label>
                     <Select
                       value={formData.listingType}
                       onValueChange={(value: Property['listingType']) =>
@@ -280,12 +280,13 @@ export default function Admin() {
                       <SelectContent>
                         <SelectItem value="sale">Venda</SelectItem>
                         <SelectItem value="rent">Aluguel</SelectItem>
+                        <SelectItem value="auction">Leilão</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
 
                   <div>
-                    <label className="text-sm font-medium">Preço (R$)</label>
+                    <label className="text-sm font-medium">{formData.listingType === 'auction' ? 'Lance inicial (R$)' : 'Preço (R$)'}</label>
                     <Input
                       type="number"
                       value={formData.price}
@@ -499,8 +500,8 @@ export default function Admin() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Imóvel</TableHead>
-                    <TableHead>Tipo</TableHead>
-                    <TableHead>Preço</TableHead>
+                    <TableHead>Modalidade</TableHead>
+                    <TableHead>Preço / lance inicial</TableHead>
                     <TableHead>Cidade</TableHead>
                     <TableHead className="text-right">Ações</TableHead>
                   </TableRow>
@@ -529,13 +530,16 @@ export default function Admin() {
                         <span
                           className={`px-2 py-1 text-xs font-medium rounded ${property.listingType === 'sale'
                             ? 'bg-success/10 text-success'
-                            : 'bg-warning/10 text-warning'
+                            : property.listingType === 'auction'
+                              ? 'bg-destructive/10 text-destructive'
+                              : 'bg-warning/10 text-warning'
                             }`}
                         >
-                          {property.listingType === 'sale' ? 'Venda' : 'Aluguel'}
+                          {property.listingType === 'sale' ? 'Venda' : property.listingType === 'rent' ? 'Aluguel' : 'Leilão'}
                         </span>
                       </TableCell>
                       <TableCell className="font-medium">
+                        {property.listingType === 'auction' && <span className="block text-xs text-muted-foreground">Lance inicial</span>}
                         {formatPrice(property.price)}
                       </TableCell>
                       <TableCell>{property.city}</TableCell>
