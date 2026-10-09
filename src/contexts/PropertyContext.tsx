@@ -84,6 +84,7 @@ export function PropertyProvider({ children }: { children: React.ReactNode }) {
 
       // Listing type filter
       if (filters.listingType && property.listingType !== filters.listingType) return false;
+      if (filters.auctionModality && property.auctionModality !== filters.auctionModality) return false;
 
       // City filter
       if (filters.city && !property.city.toLowerCase().includes(filters.city.toLowerCase())) return false;

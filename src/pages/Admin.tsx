@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useProperties } from '@/contexts/PropertyContext';
-import { Property, Lead, PropertyCapture } from '@/types/property';
+import { AuctionModality, auctionModalityLabels, Property, Lead, PropertyCapture } from '@/types/property';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -116,6 +116,7 @@ export default function Admin() {
         area: property.area,
         type: property.type,
         listingType: property.listingType,
+        auctionModality: property.auctionModality,
         images: property.images,
         features: property.features,
         yearBuilt: property.yearBuilt,
@@ -132,6 +133,11 @@ export default function Admin() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (formData.listingType === 'auction' && !formData.auctionModality) {
+      toast.error('Selecione a modalidade do leilão.');
+      return;
+    }
 
     const features = featuresInput
       .split(',')
@@ -271,7 +277,11 @@ export default function Admin() {
                     <Select
                       value={formData.listingType}
                       onValueChange={(value: Property['listingType']) =>
-                        setFormData({ ...formData, listingType: value })
+                        setFormData({
+                          ...formData,
+                          listingType: value,
+                          auctionModality: value === 'auction' ? formData.auctionModality : undefined,
+                        })
                       }
                     >
                       <SelectTrigger>
@@ -285,8 +295,29 @@ export default function Admin() {
                     </Select>
                   </div>
 
+                  {formData.listingType === 'auction' && (
+                    <div>
+                      <label className="text-sm font-medium">Modalidade do leilão *</label>
+                      <Select
+                        value={formData.auctionModality ?? '__none__'}
+                        onValueChange={(value) => setFormData({
+                          ...formData,
+                          auctionModality: value === '__none__' ? undefined : value as AuctionModality,
+                        })}
+                      >
+                        <SelectTrigger><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="__none__">Selecione uma modalidade</SelectItem>
+                          {Object.entries(auctionModalityLabels).map(([value, label]) => (
+                            <SelectItem key={value} value={value}>{label}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
+
                   <div>
-                    <label className="text-sm font-medium">{formData.listingType === 'auction' ? 'Lance inicial (R$)' : 'Preço (R$)'}</label>
+                    <label className="text-sm font-medium">{formData.listingType === 'auction' ? 'Valor da modalidade (R$)' : 'Preço (R$)'}</label>
                     <Input
                       type="number"
                       value={formData.price}
@@ -539,7 +570,7 @@ export default function Admin() {
                         </span>
                       </TableCell>
                       <TableCell className="font-medium">
-                        {property.listingType === 'auction' && <span className="block text-xs text-muted-foreground">Lance inicial</span>}
+                        {property.listingType === 'auction' && <span className="block text-xs text-muted-foreground">{property.auctionModality ? auctionModalityLabels[property.auctionModality] : 'Modalidade não informada'}</span>}
                         {formatPrice(property.price)}
                       </TableCell>
                       <TableCell>{property.city}</TableCell>

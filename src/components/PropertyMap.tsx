@@ -4,6 +4,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Property } from '@/types/property';
 import { useProperties } from '@/contexts/PropertyContext';
+import { auctionModalityLabels } from '@/types/property';
 
 // Fix for default markers
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -104,7 +105,7 @@ export function PropertyMap({
                 className="w-full h-32 object-cover rounded-t"
               />
               <div className="p-3">
-                {property.listingType === 'auction' && <p className="text-xs font-semibold text-muted-foreground">Lance inicial</p>}
+                {property.listingType === 'auction' && <p className="text-xs font-semibold text-muted-foreground">{property.auctionModality ? auctionModalityLabels[property.auctionModality] : 'Valor da modalidade'}</p>}
                 <p className="text-lg font-bold text-foreground">
                   {formatPrice(property.price, property.listingType)}
                 </p>
