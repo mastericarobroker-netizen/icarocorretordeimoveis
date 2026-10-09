@@ -28,6 +28,9 @@ export interface PropertyFilters {
   maxPrice?: number;
   bedrooms?: number;
   bathrooms?: number;
+  minArea?: number;
+  maxArea?: number;
+  parking?: number;
   type?: Property['type'];
   listingType?: Property['listingType'];
   city?: string;

@@ -11,13 +11,14 @@ interface SearchBarProps {
 }
 
 const suggestions = [
-  'Florianópolis, SC',
-  'Jurerê Internacional',
-  'Lagoa da Conceição',
-  'Centro, Florianópolis',
-  'Ingleses',
-  'Campeche',
-  'Trindade',
+  'São José dos Campos, SP',
+  'Urbanova, São José dos Campos',
+  'Jardim Aquarius, São José dos Campos',
+  'Centro, São José dos Campos',
+  'Jacareí, SP',
+  'Taubaté, SP',
+  'Caçapava, SP',
+  'Caraguatatuba, SP',
 ];
 
 export function SearchBar({ className, size = 'default', onSearch }: SearchBarProps) {

@@ -14,11 +14,11 @@ interface PropertyContextType {
   updateProperty: (id: string, property: Partial<Property>) => void;
   deleteProperty: (id: string) => void;
   leads: Lead[];
-  addLead: (lead: { propertyId: string; name: string; email: string; phone: string; message: string }) => Promise<any>;
+  addLead: (lead: { propertyId: string; name: string; email: string; phone: string; message: string }) => Promise<Lead>;
   updateLead: (id: string, updates: Partial<Lead>) => void;
   deleteLead: (id: string) => void;
   captures: PropertyCapture[];
-  addCapture: (capture: { name: string; phone: string; address: string; description: string }) => Promise<any>;
+  addCapture: (capture: { name: string; phone: string; address: string; description: string }) => Promise<PropertyCapture>;
   updateCapture: (id: string, updates: Partial<PropertyCapture>) => void;
   deleteCapture: (id: string) => void;
   searchQuery: string;
@@ -73,6 +73,11 @@ export function PropertyProvider({ children }: { children: React.ReactNode }) {
 
       // Bathrooms filter
       if (filters.bathrooms && property.bathrooms < filters.bathrooms) return false;
+
+      // Area and parking filters
+      if (filters.minArea && property.area < filters.minArea) return false;
+      if (filters.maxArea && property.area > filters.maxArea) return false;
+      if (filters.parking && (property.parking ?? 0) < filters.parking) return false;
 
       // Type filter
       if (filters.type && property.type !== filters.type) return false;
