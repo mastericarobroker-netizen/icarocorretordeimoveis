@@ -448,11 +448,11 @@ export default function Admin() {
                   </div>
 
                   <div className="col-span-2">
-                    <label className="text-sm font-medium">Fotos do Imóvel (máx. 5)</label>
+                    <label className="text-sm font-medium">Fotos do Imóvel (máx. 20)</label>
                     <ImageUploader
                       images={formData.images}
                       onImagesChange={(images) => setFormData({ ...formData, images })}
-                      maxImages={5}
+                      maxImages={20}
                     />
                   </div>
 

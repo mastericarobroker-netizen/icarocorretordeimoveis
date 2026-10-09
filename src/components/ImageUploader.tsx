@@ -14,7 +14,7 @@ interface ImageUploaderProps {
 export function ImageUploader({
   images,
   onImagesChange,
-  maxImages = 5,
+  maxImages = 20,
 }: ImageUploaderProps) {
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -26,15 +26,15 @@ export function ImageUploader({
     async (files: FileList | null) => {
       if (!files || files.length === 0) return;
 
-      const remainingSlots = maxImages - images.length;
+      let uploadedImages = [...images];
+      const remainingSlots = maxImages - uploadedImages.length;
       const filesToUpload = Array.from(files).slice(0, remainingSlots);
 
       for (const file of filesToUpload) {
         const url = await uploadImage(file);
         if (url) {
-          onImagesChange([...images, url]);
-          // Update images reference for next iteration
-          images = [...images, url];
+          uploadedImages = [...uploadedImages, url];
+          onImagesChange(uploadedImages);
         }
       }
     },
