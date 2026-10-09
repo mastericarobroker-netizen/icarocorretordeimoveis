@@ -45,8 +45,10 @@ export function HomepagePropertyCardsManager({ properties }: HomepagePropertyCar
     try {
       await saveCards.mutateAsync(orderedIds);
       toast.success('Destaques da página principal salvos.');
-    } catch {
-      toast.error('Não foi possível salvar os destaques. Verifique sua sessão e tente novamente.');
+    } catch (error) {
+      console.error('Falha ao salvar destaques da página principal:', error);
+      const message = error instanceof Error ? error.message : 'Erro inesperado.';
+      toast.error(`Não foi possível salvar os destaques: ${message}`);
     }
   };
 
