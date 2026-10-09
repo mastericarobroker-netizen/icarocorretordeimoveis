@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Home, Search, User, Menu, X, LogOut, Gavel } from 'lucide-react';
+import { Home, Search, User, Menu, X, LogOut, Gavel, ArrowLeft } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -60,6 +60,9 @@ export function Navbar() {
           </div>
 
           <div className="hidden md:flex shrink-0 items-center gap-3">
+            <Button asChild variant="outline" size="sm">
+              <a href="https://www.icaroimoveis.com.br/"><ArrowLeft className="mr-2 h-4 w-4" />Site principal</a>
+            </Button>
             {user ? (
               <>
                 <Link to="/admin">
@@ -101,6 +104,14 @@ export function Navbar() {
                   {link.label}
                 </Link>
               ))}
+
+              <a
+                href="https://www.icaroimoveis.com.br/"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-3 rounded-lg px-4 py-3 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+              >
+                <ArrowLeft className="h-5 w-5" />Voltar ao site principal
+              </a>
 
               {user ? (
                 <>
