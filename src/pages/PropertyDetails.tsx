@@ -1,6 +1,7 @@
 import { useParams, Link } from 'react-router-dom';
 import { useProperties } from '@/contexts/PropertyContext';
 import { auctionModalityLabels } from '@/types/property';
+import { getYouTubeVideoId } from '@/lib/youtube';
 import { PropertyGallery } from '@/components/PropertyGallery';
 import { LeadForm } from '@/components/LeadForm';
 import { PropertyMap } from '@/components/PropertyMap';
@@ -39,6 +40,8 @@ export default function PropertyDetails() {
       </div>
     );
   }
+
+  const youtubeVideoId = property.youtubeUrl ? getYouTubeVideoId(property.youtubeUrl) : null;
 
   const formatPrice = (price: number, listingType: string) => {
     const formatted = new Intl.NumberFormat('pt-BR', {
@@ -101,6 +104,23 @@ export default function PropertyDetails() {
           <div className="lg:col-span-2 space-y-8">
             {/* Gallery */}
             <PropertyGallery images={property.images} title={property.title} />
+
+            {youtubeVideoId && (
+              <section aria-labelledby="property-video-heading" className="space-y-3">
+                <h2 id="property-video-heading" className="text-xl font-semibold text-foreground">Vídeo do imóvel</h2>
+                <div className="aspect-video overflow-hidden rounded-xl bg-black">
+                  <iframe
+                    className="h-full w-full"
+                    src={`https://www.youtube-nocookie.com/embed/${youtubeVideoId}`}
+                    title={`Vídeo do imóvel ${property.title}`}
+                    loading="lazy"
+                    referrerPolicy="strict-origin-when-cross-origin"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowFullScreen
+                  />
+                </div>
+              </section>
+            )}
 
             {/* Price and Title */}
             <div>

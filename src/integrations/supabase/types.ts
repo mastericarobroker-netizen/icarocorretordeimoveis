@@ -108,6 +108,7 @@ export type Database = {
           user_id: string | null
           year_built: number | null
           zip_code: string
+          youtube_url: string | null
         }
         Insert: {
           address: string
@@ -134,6 +135,7 @@ export type Database = {
           user_id?: string | null
           year_built?: number | null
           zip_code: string
+          youtube_url?: string | null
         }
         Update: {
           address?: string
@@ -160,6 +162,7 @@ export type Database = {
           user_id?: string | null
           year_built?: number | null
           zip_code?: string
+          youtube_url?: string | null
         }
         Relationships: []
       }

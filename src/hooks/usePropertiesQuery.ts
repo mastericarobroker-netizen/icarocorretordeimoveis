@@ -9,8 +9,9 @@ type DbProperty = {
   price: number;
   address: string;
   auction_modality: string | null;
-  city: string;
-  state: string;
+  title: string;
+  youtube_url: string | null;
+  type: string;
   zip_code: string;
   lat: number;
   lng: number;
@@ -46,6 +47,7 @@ const dbToProperty = (row: DbProperty): Property => ({
   type: row.type as Property['type'],
   listingType: row.listing_type as Property['listingType'],
   auctionModality: (row.auction_modality as Property['auctionModality']) ?? undefined,
+  youtubeUrl: row.youtube_url ?? undefined,
   images: row.images || [],
   features: row.features || [],
   yearBuilt: row.year_built ?? undefined,
@@ -72,6 +74,7 @@ const propertyToDb = (property: Omit<Property, 'id' | 'createdAt' | 'updatedAt'>
   type: property.type,
   listing_type: property.listingType,
   auction_modality: property.auctionModality ?? null,
+  youtube_url: property.youtubeUrl?.trim() || null,
   images: property.images,
   features: property.features,
   year_built: property.yearBuilt ?? null,
@@ -153,6 +156,7 @@ export function useUpdateProperty() {
       if (updates.type !== undefined) dbUpdates.type = updates.type;
       if (updates.listingType !== undefined) dbUpdates.listing_type = updates.listingType;
       if ('auctionModality' in updates) dbUpdates.auction_modality = updates.auctionModality ?? null;
+      if ('youtubeUrl' in updates) dbUpdates.youtube_url = updates.youtubeUrl?.trim() || null;
       if (updates.images !== undefined) dbUpdates.images = updates.images;
       if (updates.features !== undefined) dbUpdates.features = updates.features;
       if (updates.yearBuilt !== undefined) dbUpdates.year_built = updates.yearBuilt;

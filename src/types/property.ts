@@ -25,6 +25,7 @@ export interface Property {
   type: 'house' | 'apartment' | 'condo' | 'land';
   listingType: 'sale' | 'rent' | 'auction';
   auctionModality?: AuctionModality;
+  youtubeUrl?: string;
   images: string[];
   features: string[];
   yearBuilt?: number;
