@@ -85,6 +85,7 @@ export type Database = {
       properties: {
         Row: {
           address: string
+          auction_modality: string | null
           area: number
           bathrooms: number
           bedrooms: number
@@ -110,6 +111,7 @@ export type Database = {
         }
         Insert: {
           address: string
+          auction_modality?: string | null
           area: number
           bathrooms: number
           bedrooms: number
@@ -135,6 +137,7 @@ export type Database = {
         }
         Update: {
           address?: string
+          auction_modality?: string | null
           area?: number
           bathrooms?: number
           bedrooms?: number

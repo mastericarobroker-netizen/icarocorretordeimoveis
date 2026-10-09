@@ -1,3 +1,13 @@
+export const auctionModalityLabels = {
+  first_auction: '1º Leilão',
+  second_auction: '2º Leilão',
+  open_bidding: 'Licitação Aberta',
+  online_sale: 'Venda Online',
+  direct_sale: 'Venda Direta',
+} as const;
+
+export type AuctionModality = keyof typeof auctionModalityLabels;
+
 export interface Property {
   id: string;
   title: string;
@@ -14,6 +24,7 @@ export interface Property {
   area: number; // sqft
   type: 'house' | 'apartment' | 'condo' | 'land';
   listingType: 'sale' | 'rent' | 'auction';
+  auctionModality?: AuctionModality;
   images: string[];
   features: string[];
   yearBuilt?: number;
@@ -33,6 +44,7 @@ export interface PropertyFilters {
   parking?: number;
   type?: Property['type'];
   listingType?: Property['listingType'];
+  auctionModality?: AuctionModality;
   city?: string;
 }
 

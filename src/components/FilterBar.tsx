@@ -1,5 +1,5 @@
 import { useProperties } from '@/contexts/PropertyContext';
-import { PropertyFilters } from '@/types/property';
+import { AuctionModality, auctionModalityLabels, PropertyFilters } from '@/types/property';
 import { Button } from '@/components/ui/button';
 import {
   Select,
@@ -27,6 +27,7 @@ function filtersToParams(filters: PropertyFilters, current: URLSearchParams) {
     if (value) next.set(key, value);
   }
   if (filters.listingType) next.set('type', filters.listingType);
+  if (filters.auctionModality) next.set('auctionModality', filters.auctionModality);
   if (filters.city) next.set('city', filters.city);
   if (filters.minPrice !== undefined) next.set('minPrice', String(filters.minPrice));
   if (filters.maxPrice !== undefined) next.set('maxPrice', String(filters.maxPrice));
@@ -44,8 +45,10 @@ export function FilterBar() {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const apply = (next: PropertyFilters) => {
-    setFilters(next);
-    setSearchParams(filtersToParams(next, searchParams), { replace: true });
+    const normalized = { ...next };
+    if (normalized.listingType !== 'auction') delete normalized.auctionModality;
+    setFilters(normalized);
+    setSearchParams(filtersToParams(normalized, searchParams), { replace: true });
   };
 
   const updateFilter = <K extends keyof PropertyFilters>(key: K, value: PropertyFilters[K] | 'all') => {
@@ -85,6 +88,16 @@ export function FilterBar() {
           <SelectItem value="auction">Imóveis em Leilão</SelectItem>
         </SelectContent>
       </Select>
+
+      {filters.listingType === 'auction' && (
+        <Select value={filters.auctionModality || 'all'} onValueChange={(v) => updateFilter('auctionModality', v === 'all' ? undefined : v as AuctionModality)}>
+          <SelectTrigger className="filter-select"><SelectValue placeholder="Modalidade do leilão" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todas as modalidades</SelectItem>
+            {Object.entries(auctionModalityLabels).map(([value, label]) => <SelectItem key={value} value={value}>{label}</SelectItem>)}
+          </SelectContent>
+        </Select>
+      )}
 
       <Select value={priceValue} onValueChange={handlePriceChange}>
         <SelectTrigger className="filter-select"><SelectValue placeholder="Preço" /></SelectTrigger>

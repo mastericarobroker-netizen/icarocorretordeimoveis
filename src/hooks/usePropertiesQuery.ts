@@ -8,6 +8,7 @@ type DbProperty = {
   description: string;
   price: number;
   address: string;
+  auction_modality: string | null;
   city: string;
   state: string;
   zip_code: string;
@@ -44,6 +45,7 @@ const dbToProperty = (row: DbProperty): Property => ({
   area: row.area,
   type: row.type as Property['type'],
   listingType: row.listing_type as Property['listingType'],
+  auctionModality: (row.auction_modality as Property['auctionModality']) ?? undefined,
   images: row.images || [],
   features: row.features || [],
   yearBuilt: row.year_built ?? undefined,
@@ -69,6 +71,7 @@ const propertyToDb = (property: Omit<Property, 'id' | 'createdAt' | 'updatedAt'>
   area: property.area,
   type: property.type,
   listing_type: property.listingType,
+  auction_modality: property.auctionModality ?? null,
   images: property.images,
   features: property.features,
   year_built: property.yearBuilt ?? null,
@@ -149,6 +152,7 @@ export function useUpdateProperty() {
       if (updates.area !== undefined) dbUpdates.area = updates.area;
       if (updates.type !== undefined) dbUpdates.type = updates.type;
       if (updates.listingType !== undefined) dbUpdates.listing_type = updates.listingType;
+      if ('auctionModality' in updates) dbUpdates.auction_modality = updates.auctionModality ?? null;
       if (updates.images !== undefined) dbUpdates.images = updates.images;
       if (updates.features !== undefined) dbUpdates.features = updates.features;
       if (updates.yearBuilt !== undefined) dbUpdates.year_built = updates.yearBuilt;

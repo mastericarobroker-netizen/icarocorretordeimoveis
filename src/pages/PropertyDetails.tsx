@@ -1,5 +1,6 @@
 import { useParams, Link } from 'react-router-dom';
 import { useProperties } from '@/contexts/PropertyContext';
+import { auctionModalityLabels } from '@/types/property';
 import { PropertyGallery } from '@/components/PropertyGallery';
 import { LeadForm } from '@/components/LeadForm';
 import { PropertyMap } from '@/components/PropertyMap';
@@ -114,12 +115,17 @@ export default function PropertyDetails() {
                 >
                   {property.listingType === 'sale' ? 'Venda' : property.listingType === 'rent' ? 'Aluguel' : 'Leilão'}
                 </span>
+                {property.listingType === 'auction' && property.auctionModality && (
+                  <span className="px-3 py-1 text-sm font-semibold bg-secondary text-secondary-foreground rounded">
+                    {auctionModalityLabels[property.auctionModality]}
+                  </span>
+                )}
                 <span className="px-3 py-1 text-sm font-semibold bg-secondary text-secondary-foreground rounded">
                   {typeLabels[property.type]}
                 </span>
               </div>
 
-              {property.listingType === 'auction' && <p className="mb-1 text-sm font-semibold text-muted-foreground">Lance inicial</p>}
+              {property.listingType === 'auction' && <p className="mb-1 text-sm font-semibold text-muted-foreground">Valor da modalidade</p>}
               <h1 className="text-3xl lg:text-4xl font-bold text-foreground mb-2">
                 {formatPrice(property.price, property.listingType)}
               </h1>

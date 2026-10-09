@@ -1,4 +1,4 @@
-import { Property } from '@/types/property';
+import { auctionModalityLabels, Property } from '@/types/property';
 import { Bed, Bath, Square, MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -70,6 +70,11 @@ export function PropertyCard({
               {listingLabels[property.listingType]}
             </span>
           </div>
+          {property.listingType === 'auction' && property.auctionModality && (
+            <span className="absolute bottom-2 left-2 rounded bg-white/95 px-2 py-1 text-[10px] font-bold text-foreground shadow-sm">
+              {auctionModalityLabels[property.auctionModality]}
+            </span>
+          )}
         </div>
 
         {/* Content - Right Side */}
@@ -77,7 +82,7 @@ export function PropertyCard({
           <div>
             <div className="flex justify-between items-start">
               <p className="text-xl font-bold text-foreground">
-                {property.listingType === 'auction' && <span className="block text-xs font-semibold text-muted-foreground">Lance inicial</span>}
+                {property.listingType === 'auction' && <span className="block text-xs font-semibold text-muted-foreground">{property.auctionModality ? auctionModalityLabels[property.auctionModality] : 'Valor da modalidade'}</span>}
                 {formatPrice(property.price, property.listingType)}
               </p>
             </div>
@@ -143,6 +148,11 @@ export function PropertyCard({
           <span className="px-1.5 py-0.5 text-[10px] font-bold bg-white/90 text-foreground uppercase tracking-wide rounded-sm shadow-sm">
             {typeLabels[property.type]}
           </span>
+          {property.listingType === 'auction' && property.auctionModality && (
+            <span className="px-1.5 py-0.5 text-[10px] font-bold bg-white/90 text-foreground tracking-wide rounded-sm shadow-sm">
+              {auctionModalityLabels[property.auctionModality]}
+            </span>
+          )}
         </div>
       </div>
 
@@ -151,7 +161,7 @@ export function PropertyCard({
         {/* Price */}
         <div className="flex items-baseline justify-between">
           <p className="text-2xl font-bold text-foreground tracking-tight">
-            {property.listingType === 'auction' && <span className="block text-xs font-semibold text-muted-foreground">Lance inicial</span>}
+            {property.listingType === 'auction' && <span className="block text-xs font-semibold text-muted-foreground">{property.auctionModality ? auctionModalityLabels[property.auctionModality] : 'Valor da modalidade'}</span>}
             {formatPrice(property.price, property.listingType)}
           </p>
         </div>

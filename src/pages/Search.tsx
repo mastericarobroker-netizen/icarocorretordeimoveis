@@ -5,7 +5,7 @@ import { PropertyCard } from '@/components/PropertyCard';
 import { PropertyMap } from '@/components/PropertyMap';
 import { FilterBar } from '@/components/FilterBar';
 import { SearchBar } from '@/components/SearchBar';
-import { Property } from '@/types/property';
+import { AuctionModality, auctionModalityLabels, Property } from '@/types/property';
 import { Button } from '@/components/ui/button';
 import { Map, List, Search as SearchIcon, ArrowUpDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -18,6 +18,10 @@ export default function Search() {
 
   useEffect(() => {
     const type = searchParams.get('type');
+    const modalityParam = searchParams.get('auctionModality');
+    const auctionModality = modalityParam && Object.prototype.hasOwnProperty.call(auctionModalityLabels, modalityParam)
+      ? modalityParam as AuctionModality
+      : undefined;
     const minPrice = searchParams.get('minPrice');
     const maxPrice = searchParams.get('maxPrice');
     const beds = searchParams.get('beds');
@@ -32,6 +36,7 @@ export default function Search() {
     setSearchQuery(query);
     setFilters({
       listingType: type === 'rent' ? 'rent' : type === 'auction' ? 'auction' : 'sale',
+      ...(type === 'auction' && auctionModality ? { auctionModality } : {}),
       ...(minPrice ? { minPrice: Number(minPrice) } : {}),
       ...(maxPrice ? { maxPrice: Number(maxPrice) } : {}),
       ...(beds ? { bedrooms: Number(beds) } : {}),
