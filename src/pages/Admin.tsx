@@ -49,6 +49,7 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { ImageUploader } from '@/components/ImageUploader';
+import { getYouTubeVideoId } from '@/lib/youtube';
 
 type PropertyFormData = Omit<Property, 'id' | 'createdAt' | 'updatedAt'>;
 
@@ -67,6 +68,7 @@ const initialFormData: PropertyFormData = {
   area: 0,
   type: 'house',
   listingType: 'sale',
+  youtubeUrl: '',
   images: [],
   features: [],
   parking: 1,
@@ -117,6 +119,7 @@ export default function Admin() {
         type: property.type,
         listingType: property.listingType,
         auctionModality: property.auctionModality,
+        youtubeUrl: property.youtubeUrl ?? '',
         images: property.images,
         features: property.features,
         yearBuilt: property.yearBuilt,
@@ -139,12 +142,23 @@ export default function Admin() {
       return;
     }
 
+    const youtubeUrl = formData.youtubeUrl?.trim();
+    const youtubeVideoId = youtubeUrl ? getYouTubeVideoId(youtubeUrl) : null;
+    if (youtubeUrl && !youtubeVideoId) {
+      toast.error('Informe um link válido de vídeo do YouTube.');
+      return;
+    }
+
     const features = featuresInput
       .split(',')
       .map((f) => f.trim())
       .filter((f) => f.length > 0);
 
-    const propertyData = { ...formData, features };
+    const propertyData = {
+      ...formData,
+      features,
+      youtubeUrl: youtubeVideoId ? `https://www.youtube.com/watch?v=${youtubeVideoId}` : undefined,
+    };
 
     if (editingProperty) {
       updateProperty(editingProperty.id, propertyData);
@@ -454,6 +468,19 @@ export default function Admin() {
                       onImagesChange={(images) => setFormData({ ...formData, images })}
                       maxImages={20}
                     />
+                  </div>
+
+                  <div className="col-span-2">
+                    <label htmlFor="property-youtube-url" className="text-sm font-medium">Link do vídeo no YouTube (opcional)</label>
+                    <Input
+                      id="property-youtube-url"
+                      type="url"
+                      value={formData.youtubeUrl ?? ''}
+                      onChange={(e) => setFormData({ ...formData, youtubeUrl: e.target.value })}
+                      placeholder="https://www.youtube.com/watch?v=..."
+                      autoComplete="off"
+                    />
+                    <p className="mt-1 text-xs text-muted-foreground">O vídeo será exibido incorporado na página deste imóvel.</p>
                   </div>
 
                   <div className="col-span-2">
