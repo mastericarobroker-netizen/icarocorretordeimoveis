@@ -31,7 +31,7 @@ export default function PropertyDetails() {
           <h1 className="text-2xl font-bold text-foreground mb-4">
             Imóvel não encontrado
           </h1>
-          <Link to="/buscar">
+          <Link to={property.listingType === 'auction' ? '/buscar?type=auction' : `/buscar?type=${property.listingType}`}>
             <Button>Voltar para busca</Button>
           </Link>
         </div>
@@ -74,7 +74,7 @@ export default function PropertyDetails() {
       <div className="bg-card border-b border-border sticky top-16 z-40">
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
           <Link
-            to="/buscar"
+            to={`/buscar?type=${property.listingType}`}
             className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
           >
             <ArrowLeft className="h-4 w-4" />
@@ -107,16 +107,19 @@ export default function PropertyDetails() {
                 <span
                   className={`px-3 py-1 text-sm font-semibold rounded ${property.listingType === 'sale'
                       ? 'bg-success text-success-foreground'
-                      : 'bg-warning text-warning-foreground'
+                      : property.listingType === 'auction'
+                        ? 'bg-destructive text-destructive-foreground'
+                        : 'bg-warning text-warning-foreground'
                     }`}
                 >
-                  {property.listingType === 'sale' ? 'Venda' : 'Aluguel'}
+                  {property.listingType === 'sale' ? 'Venda' : property.listingType === 'rent' ? 'Aluguel' : 'Leilão'}
                 </span>
                 <span className="px-3 py-1 text-sm font-semibold bg-secondary text-secondary-foreground rounded">
                   {typeLabels[property.type]}
                 </span>
               </div>
 
+              {property.listingType === 'auction' && <p className="mb-1 text-sm font-semibold text-muted-foreground">Lance inicial</p>}
               <h1 className="text-3xl lg:text-4xl font-bold text-foreground mb-2">
                 {formatPrice(property.price, property.listingType)}
               </h1>

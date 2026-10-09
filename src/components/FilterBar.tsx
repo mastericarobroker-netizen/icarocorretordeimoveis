@@ -82,6 +82,7 @@ export function FilterBar() {
         <SelectContent>
           <SelectItem value="sale">À venda</SelectItem>
           <SelectItem value="rent">Para alugar</SelectItem>
+          <SelectItem value="auction">Imóveis em Leilão</SelectItem>
         </SelectContent>
       </Select>
 
