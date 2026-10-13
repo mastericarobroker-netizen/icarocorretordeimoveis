@@ -97,7 +97,7 @@ export function HomepagePropertyCardsManager({ properties }: HomepagePropertyCar
                     const price = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(property.price);
                     return (
                       <SelectItem key={property.id} value={property.id} disabled={selectedInAnotherSlot}>
-                        {property.title} — {property.city} — {price}
+                        {property.title}{property.isAvailable === false ? ' — Indisponível' : ''} — {property.city} — {price}
                       </SelectItem>
                     );
                   })}

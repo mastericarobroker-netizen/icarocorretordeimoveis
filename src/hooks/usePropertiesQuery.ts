@@ -8,10 +8,8 @@ type DbProperty = {
   description: string;
   price: number;
   address: string;
-  auction_modality: string | null;
-  title: string;
-  youtube_url: string | null;
-  type: string;
+  city: string;
+  state: string;
   zip_code: string;
   lat: number;
   lng: number;
@@ -20,11 +18,14 @@ type DbProperty = {
   area: number;
   type: string;
   listing_type: string;
+  auction_modality: string | null;
+  youtube_url: string | null;
   images: string[] | null;
   features: string[] | null;
   year_built: number | null;
   parking: number | null;
   featured: boolean | null;
+  is_available: boolean;
   created_at: string;
   updated_at: string;
 };
@@ -53,6 +54,7 @@ const dbToProperty = (row: DbProperty): Property => ({
   yearBuilt: row.year_built ?? undefined,
   parking: row.parking ?? undefined,
   featured: row.featured ?? undefined,
+  isAvailable: row.is_available ?? true,
   createdAt: row.created_at,
   updatedAt: row.updated_at,
 });
@@ -80,6 +82,7 @@ const propertyToDb = (property: Omit<Property, 'id' | 'createdAt' | 'updatedAt'>
   year_built: property.yearBuilt ?? null,
   parking: property.parking ?? null,
   featured: property.featured ?? null,
+  is_available: property.isAvailable ?? true,
 });
 
 export function usePropertiesQuery() {
@@ -162,6 +165,7 @@ export function useUpdateProperty() {
       if (updates.yearBuilt !== undefined) dbUpdates.year_built = updates.yearBuilt;
       if (updates.parking !== undefined) dbUpdates.parking = updates.parking;
       if (updates.featured !== undefined) dbUpdates.featured = updates.featured;
+      if (updates.isAvailable !== undefined) dbUpdates.is_available = updates.isAvailable;
 
       const { data, error } = await supabase
         .from('properties')

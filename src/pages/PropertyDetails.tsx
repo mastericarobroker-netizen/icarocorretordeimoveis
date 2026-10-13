@@ -113,7 +113,7 @@ export default function PropertyDetails() {
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-8">
             {/* Gallery */}
-            <PropertyGallery images={property.images} title={property.title} />
+            <PropertyGallery images={property.images} title={property.title} isAvailable={property.isAvailable !== false} />
 
             {youtubeVideoId && (
               <section aria-labelledby="property-video-heading" className="space-y-3">
@@ -153,6 +153,11 @@ export default function PropertyDetails() {
                 <span className="px-3 py-1 text-sm font-semibold bg-secondary text-secondary-foreground rounded">
                   {typeLabels[property.type]}
                 </span>
+                {property.isAvailable === false && (
+                  <span className="px-3 py-1 text-sm font-semibold bg-muted text-muted-foreground rounded">
+                    Indisponível
+                  </span>
+                )}
               </div>
 
               {property.listingType === 'auction' && <p className="mb-1 text-sm font-semibold text-muted-foreground">Valor da modalidade</p>}

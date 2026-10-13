@@ -38,6 +38,7 @@ export function PropertyCard({
     condo: 'Cobertura',
     land: 'Terreno',
   };
+  const isUnavailable = property.isAvailable === false;
 
   // Compact variant uses a horizontal layout like Zillow
   if (variant === 'compact') {
@@ -56,9 +57,14 @@ export function PropertyCard({
           <img
             src={property.images[0]}
             alt={property.title}
-            className="w-full h-full object-cover"
+            className={cn('w-full h-full object-cover', isUnavailable && 'grayscale')}
           />
-          <div className="absolute top-2 left-2">
+          {isUnavailable && (
+            <span className="absolute inset-0 z-10 flex items-center justify-center bg-black/10">
+              <span className="rounded-full bg-black/75 px-3 py-1 text-xs font-bold text-white">Indisponível</span>
+            </span>
+          )}
+          <div className="absolute top-2 left-2 z-20">
             <span
               className={cn(
                 'px-1.5 py-0.5 text-[10px] font-semibold rounded uppercase tracking-wider',
@@ -71,7 +77,7 @@ export function PropertyCard({
             </span>
           </div>
           {property.listingType === 'auction' && property.auctionModality && (
-            <span className="absolute bottom-2 left-2 rounded bg-white/95 px-2 py-1 text-[10px] font-bold text-foreground shadow-sm">
+            <span className="absolute bottom-2 left-2 z-20 rounded bg-white/95 px-2 py-1 text-[10px] font-bold text-foreground shadow-sm">
               {auctionModalityLabels[property.auctionModality]}
             </span>
           )}
@@ -136,10 +142,15 @@ export function PropertyCard({
         <img
           src={property.images[0]}
           alt={property.title}
-          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+          className={cn('w-full h-full object-cover transition-transform duration-300 group-hover:scale-105', isUnavailable && 'grayscale')}
         />
+        {isUnavailable && (
+          <span className="absolute inset-0 z-10 flex items-center justify-center bg-black/10">
+            <span className="rounded-full bg-black/75 px-3 py-1 text-xs font-bold text-white">Indisponível</span>
+          </span>
+        )}
         {/* Badges */}
-        <div className="absolute top-2 left-2 flex gap-1">
+        <div className="absolute top-2 left-2 z-20 flex gap-1">
           {property.featured && (
             <span className="px-1.5 py-0.5 text-[10px] font-bold bg-white/90 text-foreground uppercase tracking-wide rounded-sm shadow-sm">
               Destaque
