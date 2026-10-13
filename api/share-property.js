@@ -21,11 +21,7 @@ function getRequestPropertyId(request) {
 }
 
 function getDeploymentOrigin() {
-  const deploymentHost = String(process.env.VERCEL_URL || 'imoveis.icaroimoveis.com.br')
-    .replace(/^https?:\/\//i, '')
-    .split('/')[0];
-  if (!/^[a-z0-9.-]+$/i.test(deploymentHost)) return SITE_ORIGIN;
-  return `https://${deploymentHost}`;
+  return SITE_ORIGIN;
 }
 
 async function fetchShell() {
