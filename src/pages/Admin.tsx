@@ -51,6 +51,7 @@ import { Link } from 'react-router-dom';
 import { ImageUploader } from '@/components/ImageUploader';
 import { getYouTubeVideoId } from '@/lib/youtube';
 import { HomepagePropertyCardsManager } from '@/components/HomepagePropertyCardsManager';
+import { WatermarkedImage } from '@/components/WatermarkedImage';
 
 type PropertyFormData = Omit<Property, 'id' | 'createdAt' | 'updatedAt'>;
 
@@ -581,10 +582,12 @@ export default function Admin() {
                     <TableRow key={property.id}>
                       <TableCell>
                         <div className="flex items-center gap-3">
-                          <img
+                          <WatermarkedImage
                             src={property.images[0]}
                             alt={property.title}
-                            className={`w-16 h-12 object-cover rounded ${property.isAvailable === false ? 'grayscale' : ''}`}
+                            className="h-12 w-16 shrink-0 rounded"
+                            imageClassName={`object-cover ${property.isAvailable === false ? 'grayscale' : ''}`}
+                            watermarkClassName="w-[32%] max-w-none"
                           />
                           <div>
                             <p className="font-medium text-foreground line-clamp-1">

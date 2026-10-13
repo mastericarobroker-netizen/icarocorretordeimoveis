@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { WatermarkedImage } from '@/components/WatermarkedImage';
 
 interface PropertyGalleryProps {
   images: string[];
@@ -29,10 +30,11 @@ export function PropertyGallery({ images, title, isAvailable = true }: PropertyG
           className="relative aspect-[16/9] cursor-pointer overflow-hidden rounded-lg"
           onClick={() => setIsFullscreen(true)}
         >
-          <img
+          <WatermarkedImage
             src={images[currentIndex]}
             alt={`${title} - Foto ${currentIndex + 1}`}
-            className={cn('w-full h-full object-cover', !isAvailable && 'grayscale')}
+            className="absolute inset-0"
+            imageClassName={cn('object-cover', !isAvailable && 'grayscale')}
           />
           {!isAvailable && (
             <span className="absolute left-4 top-4 rounded-full bg-black/75 px-4 py-2 text-sm font-semibold text-white">
@@ -84,10 +86,12 @@ export function PropertyGallery({ images, title, isAvailable = true }: PropertyG
                     : 'border-transparent opacity-70 hover:opacity-100'
                 )}
               >
-                <img
+                <WatermarkedImage
                   src={image}
                   alt={`Miniatura ${index + 1}`}
-                  className={cn('w-full h-full object-cover', !isAvailable && 'grayscale')}
+                  className="h-full w-full"
+                  imageClassName={cn('object-cover', !isAvailable && 'grayscale')}
+                  watermarkClassName="w-[32%]"
                 />
               </button>
             ))}
@@ -124,10 +128,12 @@ export function PropertyGallery({ images, title, isAvailable = true }: PropertyG
             <ChevronLeft className="h-8 w-8" />
           </button>
 
-          <img
+          <WatermarkedImage
             src={images[currentIndex]}
             alt={`${title} - Foto ${currentIndex + 1}`}
-            className={cn('max-w-[90vw] max-h-[90vh] object-contain', !isAvailable && 'grayscale')}
+            className="relative inline-flex max-h-[90vh] max-w-[90vw]"
+            imageClassName={cn('h-auto w-auto max-h-[90vh] max-w-[90vw] object-contain', !isAvailable && 'grayscale')}
+            watermarkClassName="w-[28%]"
             onClick={(e) => e.stopPropagation()}
           />
 

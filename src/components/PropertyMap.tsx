@@ -5,6 +5,7 @@ import 'leaflet/dist/leaflet.css';
 import { Property } from '@/types/property';
 import { useProperties } from '@/contexts/PropertyContext';
 import { auctionModalityLabels } from '@/types/property';
+import { WatermarkedImage } from '@/components/WatermarkedImage';
 
 // Fix for default markers
 delete (L.Icon.Default.prototype as unknown as { _getIconUrl?: unknown })._getIconUrl;
@@ -100,10 +101,11 @@ export function PropertyMap({
           <Popup>
             <div className="w-64 p-0">
               <div className="relative">
-                <img
+                <WatermarkedImage
                   src={property.images[0]}
                   alt={property.title}
-                  className={`w-full h-32 object-cover rounded-t ${property.isAvailable === false ? 'grayscale' : ''}`}
+                  className="h-32 w-full rounded-t"
+                  imageClassName={`object-cover ${property.isAvailable === false ? 'grayscale' : ''}`}
                 />
                 {property.isAvailable === false && (
                   <span className="absolute inset-0 flex items-center justify-center rounded-t bg-black/10">

@@ -2,6 +2,7 @@ import { auctionModalityLabels, Property } from '@/types/property';
 import { Bed, Bath, Square, MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
+import { WatermarkedImage } from '@/components/WatermarkedImage';
 
 interface PropertyCardProps {
   property: Property;
@@ -54,10 +55,11 @@ export function PropertyCard({
       >
         {/* Image - Left Side */}
         <div className="relative w-[40%] min-w-[140px] md:w-[180px]">
-          <img
+          <WatermarkedImage
             src={property.images[0]}
             alt={property.title}
-            className={cn('w-full h-full object-cover', isUnavailable && 'grayscale')}
+            className="absolute inset-0"
+            imageClassName={cn('object-cover', isUnavailable && 'grayscale')}
           />
           {isUnavailable && (
             <span className="absolute inset-0 z-10 flex items-center justify-center bg-black/10">
@@ -139,10 +141,11 @@ export function PropertyCard({
     >
       {/* Image */}
       <div className="relative aspect-[16/9] overflow-hidden">
-        <img
+        <WatermarkedImage
           src={property.images[0]}
           alt={property.title}
-          className={cn('w-full h-full object-cover transition-transform duration-300 group-hover:scale-105', isUnavailable && 'grayscale')}
+          className="absolute inset-0"
+          imageClassName={cn('object-cover transition-transform duration-300 group-hover:scale-105', isUnavailable && 'grayscale')}
         />
         {isUnavailable && (
           <span className="absolute inset-0 z-10 flex items-center justify-center bg-black/10">
