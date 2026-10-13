@@ -1,4 +1,6 @@
 const SITE_ORIGIN = 'https://imoveis.icaroimoveis.com.br';
+const SUPABASE_STORAGE_HOST = 'yvzhiejargcejzjgrqwx.supabase.co';
+const PROPERTY_IMAGES_PATH = '/storage/v1/object/public/property-images/';
 
 const auctionModalityLabels = {
   first_auction: '1º Leilão',
@@ -50,6 +52,24 @@ function publicImageUrl(images) {
   return '';
 }
 
+function shareImageUrl(images) {
+  const sourceImageUrl = publicImageUrl(images);
+  if (!sourceImageUrl) return '';
+
+  try {
+    const source = new URL(sourceImageUrl);
+    if (source.hostname !== SUPABASE_STORAGE_HOST || !source.pathname.startsWith(PROPERTY_IMAGES_PATH)) {
+      return sourceImageUrl;
+    }
+
+    const previewImage = new URL('/api/share-property-image', SITE_ORIGIN);
+    previewImage.searchParams.set('source', source.toString());
+    return previewImage.toString();
+  } catch {
+    return sourceImageUrl;
+  }
+}
+
 function formatProperty(property) {
   const title = plainText(property.title) || 'Imóvel';
   const operation = property.listing_type === 'rent'
@@ -78,7 +98,7 @@ function formatProperty(property) {
   return {
     title: truncate(`${title} | Ícaro Corretor de Imóveis`, 100),
     description: truncate(summary || 'Confira os detalhes deste imóvel no site Ícaro Corretor de Imóveis.', 200),
-    image: publicImageUrl(property.images),
+    image: shareImageUrl(property.images),
     location,
     price,
   };
