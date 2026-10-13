@@ -24,6 +24,7 @@ export interface Property {
   area: number; // sqft
   type: 'house' | 'apartment' | 'condo' | 'land';
   listingType: 'sale' | 'rent' | 'auction';
+  isAvailable?: boolean;
   auctionModality?: AuctionModality;
   youtubeUrl?: string;
   images: string[];

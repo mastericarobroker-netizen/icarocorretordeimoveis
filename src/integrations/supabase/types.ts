@@ -121,6 +121,7 @@ export type Database = {
           featured: boolean | null
           features: string[] | null
           id: string
+          is_available: boolean
           images: string[] | null
           lat: number
           listing_type: string
@@ -148,6 +149,7 @@ export type Database = {
           featured?: boolean | null
           features?: string[] | null
           id?: string
+          is_available?: boolean
           images?: string[] | null
           lat: number
           listing_type: string
@@ -175,6 +177,7 @@ export type Database = {
           featured?: boolean | null
           features?: string[] | null
           id?: string
+          is_available?: boolean
           images?: string[] | null
           lat?: number
           listing_type?: string
@@ -209,6 +212,7 @@ export type Database = {
           state: string
           title: string
           type: string
+          is_available: boolean
         }
         Relationships: []
       }

@@ -7,7 +7,7 @@ import { useProperties } from '@/contexts/PropertyContext';
 import { auctionModalityLabels } from '@/types/property';
 
 // Fix for default markers
-delete (L.Icon.Default.prototype as any)._getIconUrl;
+delete (L.Icon.Default.prototype as unknown as { _getIconUrl?: unknown })._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
   iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
@@ -99,11 +99,18 @@ export function PropertyMap({
         >
           <Popup>
             <div className="w-64 p-0">
-              <img
-                src={property.images[0]}
-                alt={property.title}
-                className="w-full h-32 object-cover rounded-t"
-              />
+              <div className="relative">
+                <img
+                  src={property.images[0]}
+                  alt={property.title}
+                  className={`w-full h-32 object-cover rounded-t ${property.isAvailable === false ? 'grayscale' : ''}`}
+                />
+                {property.isAvailable === false && (
+                  <span className="absolute inset-0 flex items-center justify-center rounded-t bg-black/10">
+                    <span className="rounded-full bg-black/75 px-3 py-1 text-xs font-bold text-white">Indisponível</span>
+                  </span>
+                )}
+              </div>
               <div className="p-3">
                 {property.listingType === 'auction' && <p className="text-xs font-semibold text-muted-foreground">{property.auctionModality ? auctionModalityLabels[property.auctionModality] : 'Valor da modalidade'}</p>}
                 <p className="text-lg font-bold text-foreground">

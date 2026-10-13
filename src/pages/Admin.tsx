@@ -69,6 +69,7 @@ const initialFormData: PropertyFormData = {
   area: 0,
   type: 'house',
   listingType: 'sale',
+  isAvailable: true,
   youtubeUrl: '',
   images: [],
   features: [],
@@ -119,6 +120,7 @@ export default function Admin() {
         area: property.area,
         type: property.type,
         listingType: property.listingType,
+        isAvailable: property.isAvailable ?? true,
         auctionModality: property.auctionModality,
         youtubeUrl: property.youtubeUrl ?? '',
         images: property.images,
@@ -180,6 +182,12 @@ export default function Admin() {
       deleteProperty(id);
       toast.success('Imóvel excluído com sucesso');
     }
+  };
+
+  const handleTogglePropertyAvailability = (property: Property) => {
+    const nextAvailability = property.isAvailable === false;
+    updateProperty(property.id, { isAvailable: nextAvailability });
+    toast.success(nextAvailability ? 'Imóvel marcado como disponível.' : 'Imóvel marcado como indisponível.');
   };
 
   const handleUpdateLeadStatus = (id: string, status: Lead['status']) => {
@@ -564,6 +572,7 @@ export default function Admin() {
                     <TableHead>Modalidade</TableHead>
                     <TableHead>Preço / lance inicial</TableHead>
                     <TableHead>Cidade</TableHead>
+                    <TableHead>Disponibilidade</TableHead>
                     <TableHead className="text-right">Ações</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -575,7 +584,7 @@ export default function Admin() {
                           <img
                             src={property.images[0]}
                             alt={property.title}
-                            className="w-16 h-12 object-cover rounded"
+                            className={`w-16 h-12 object-cover rounded ${property.isAvailable === false ? 'grayscale' : ''}`}
                           />
                           <div>
                             <p className="font-medium text-foreground line-clamp-1">
@@ -605,12 +614,35 @@ export default function Admin() {
                       </TableCell>
                       <TableCell>{property.city}</TableCell>
                       <TableCell>
+                        <Badge
+                          variant="secondary"
+                          className={property.isAvailable === false
+                            ? 'bg-muted text-muted-foreground'
+                            : 'bg-success/10 text-success'}
+                        >
+                          {property.isAvailable === false ? 'Indisponível' : 'Disponível'}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
                         <div className="flex justify-end gap-2">
                           <Link to={`/imovel/${property.id}`}>
                             <Button variant="ghost" size="sm">
                               <Eye className="h-4 w-4" />
                             </Button>
                           </Link>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleTogglePropertyAvailability(property)}
+                            aria-label={property.isAvailable === false
+                              ? `Marcar ${property.title} como disponível`
+                              : `Marcar ${property.title} como indisponível`}
+                            title={property.isAvailable === false ? 'Marcar como disponível' : 'Marcar como indisponível'}
+                          >
+                            {property.isAvailable === false
+                              ? <CheckCircle2 className="h-4 w-4 text-success" />
+                              : <AlertCircle className="h-4 w-4 text-muted-foreground" />}
+                          </Button>
                           <Button
                             variant="ghost"
                             size="sm"
@@ -672,7 +704,7 @@ export default function Admin() {
                         <TableCell>
                           <Select
                             value={lead.status}
-                            onValueChange={(value: any) => handleUpdateLeadStatus(lead.id, value)}
+                            onValueChange={(value: Lead['status']) => handleUpdateLeadStatus(lead.id, value)}
                           >
                             <SelectTrigger className="w-[130px] h-8 text-xs">
                               <SelectValue placeholder="Status" />
@@ -762,7 +794,7 @@ export default function Admin() {
                         <TableCell>
                           <Select
                             value={capture.status}
-                            onValueChange={(value: any) => handleUpdateCaptureStatus(capture.id, value)}
+                            onValueChange={(value: PropertyCapture['status']) => handleUpdateCaptureStatus(capture.id, value)}
                           >
                             <SelectTrigger className="w-[130px] h-8 text-xs">
                               <SelectValue placeholder="Status" />

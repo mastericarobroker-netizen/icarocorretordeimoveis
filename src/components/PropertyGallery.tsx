@@ -5,9 +5,10 @@ import { cn } from '@/lib/utils';
 interface PropertyGalleryProps {
   images: string[];
   title: string;
+  isAvailable?: boolean;
 }
 
-export function PropertyGallery({ images, title }: PropertyGalleryProps) {
+export function PropertyGallery({ images, title, isAvailable = true }: PropertyGalleryProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
@@ -31,8 +32,13 @@ export function PropertyGallery({ images, title }: PropertyGalleryProps) {
           <img
             src={images[currentIndex]}
             alt={`${title} - Foto ${currentIndex + 1}`}
-            className="w-full h-full object-cover"
+            className={cn('w-full h-full object-cover', !isAvailable && 'grayscale')}
           />
+          {!isAvailable && (
+            <span className="absolute left-4 top-4 rounded-full bg-black/75 px-4 py-2 text-sm font-semibold text-white">
+              Indisponível
+            </span>
+          )}
           
           {/* Navigation Arrows */}
           {images.length > 1 && (
@@ -81,7 +87,7 @@ export function PropertyGallery({ images, title }: PropertyGalleryProps) {
                 <img
                   src={image}
                   alt={`Miniatura ${index + 1}`}
-                  className="w-full h-full object-cover"
+                  className={cn('w-full h-full object-cover', !isAvailable && 'grayscale')}
                 />
               </button>
             ))}
@@ -102,6 +108,12 @@ export function PropertyGallery({ images, title }: PropertyGalleryProps) {
             <X className="h-6 w-6" />
           </button>
 
+          {!isAvailable && (
+            <span className="absolute left-4 top-4 rounded-full bg-black/75 px-4 py-2 text-sm font-semibold text-white">
+              Indisponível
+            </span>
+          )}
+
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -115,7 +127,7 @@ export function PropertyGallery({ images, title }: PropertyGalleryProps) {
           <img
             src={images[currentIndex]}
             alt={`${title} - Foto ${currentIndex + 1}`}
-            className="max-w-[90vw] max-h-[90vh] object-contain"
+            className={cn('max-w-[90vw] max-h-[90vh] object-contain', !isAvailable && 'grayscale')}
             onClick={(e) => e.stopPropagation()}
           />
 

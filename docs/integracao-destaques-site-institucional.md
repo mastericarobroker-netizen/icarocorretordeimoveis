@@ -36,6 +36,7 @@ type HomepagePropertyCard = {
   city: string;
   state: string;
   images: string[] | null;
+  is_available: boolean;
   listing_type: 'sale' | 'rent' | 'auction';
   auction_modality: string | null;
   type: string;
@@ -53,7 +54,7 @@ export function FeaturedProperties() {
     async function load() {
       const { data, error } = await supabase
         .from('homepage_property_cards_public')
-        .select('position, property_id, title, price, city, state, images, listing_type, auction_modality, type, bedrooms, bathrooms, area')
+        .select('position, property_id, title, price, city, state, images, is_available, listing_type, auction_modality, type, bedrooms, bathrooms, area')
         .order('position', { ascending: true })
         .limit(4);
 
@@ -76,11 +77,16 @@ export function FeaturedProperties() {
       <div className="property-cards">
         {properties.map((property) => (
           <a
-            className="property-card"
+            className={`property-card${property.is_available ? '' : ' property-card--unavailable'}`}
             key={property.property_id}
             href={`${PROPERTY_PORTAL}/imovel/${property.property_id}`}
           >
-            {property.images?.[0] && <img src={property.images[0]} alt={property.title} loading="lazy" />}
+            {property.images?.[0] && (
+              <div className="property-card__image">
+                <img src={property.images[0]} alt={property.title} loading="lazy" />
+                {!property.is_available && <span className="property-card__availability">Indisponível</span>}
+              </div>
+            )}
             <h3>{property.title}</h3>
             <p>{property.city} - {property.state}</p>
             <p>{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(property.price)}</p>
@@ -92,6 +98,20 @@ export function FeaturedProperties() {
 }
 ```
 
+Para manter o mesmo tratamento visual no site institucional, adicione ao CSS do card:
+
+```css
+.property-card__image { position: relative; }
+.property-card__image img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.property-card--unavailable .property-card__image img { filter: grayscale(1); }
+.property-card__availability {
+  position: absolute; inset: auto 0 0; padding: .5rem; text-align: center;
+  color: #fff; background: rgb(0 0 0 / 70%); font-weight: 700;
+}
+```
+
+Os imóveis já cadastrados e os novos são considerados disponíveis por padrão. Ao marcar um anúncio como indisponível no painel, `is_available` passa a `false`; o site institucional pode aplicar o estilo acima sem remover o card.
+
 A consulta já devolve as posições em ordem crescente. Ao clicar em um card, o visitante abre o anúncio original no portal de imóveis. É possível adaptar o markup ao framework e ao visual do site institucional sem alterar a consulta.
 
 ## Campos retornados
@@ -102,6 +122,7 @@ A consulta já devolve as posições em ordem crescente. Ao clicar em um card, o
 | `property_id` | Montagem do link do anúncio |
 | `title`, `price`, `city`, `state` | Texto principal e localização |
 | `images` | Foto de capa em `images[0]` |
+| `is_available` | `true` para disponível; `false` para indisponível (aplique escala de cinza e selo) |
 | `listing_type`, `auction_modality` | Badge de venda, aluguel ou modalidade do leilão |
 | `type`, `bedrooms`, `bathrooms`, `area` | Detalhes opcionais do card |
 
