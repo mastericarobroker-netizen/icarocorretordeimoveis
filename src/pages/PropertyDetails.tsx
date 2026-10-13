@@ -2,6 +2,7 @@ import { useParams, Link } from 'react-router-dom';
 import { useProperties } from '@/contexts/PropertyContext';
 import { auctionModalityLabels } from '@/types/property';
 import { getYouTubeVideoId } from '@/lib/youtube';
+import { buildPropertyShareUrl } from '@/lib/propertyShareUrl';
 import { PropertyGallery } from '@/components/PropertyGallery';
 import { LeadForm } from '@/components/LeadForm';
 import { PropertyMap } from '@/components/PropertyMap';
@@ -68,14 +69,15 @@ export default function PropertyDetails() {
   };
 
   const handleShare = async () => {
+    const shareUrl = buildPropertyShareUrl(window.location.href, property);
     try {
       await navigator.share({
         title: property.title,
         text: `Confira este imóvel: ${property.title}`,
-        url: window.location.href,
+        url: shareUrl,
       });
     } catch {
-      navigator.clipboard.writeText(window.location.href);
+      navigator.clipboard.writeText(shareUrl);
       toast.success('Link copiado para a área de transferência!');
     }
   };
