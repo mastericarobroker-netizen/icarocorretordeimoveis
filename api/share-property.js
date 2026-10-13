@@ -37,13 +37,46 @@ async function fetchShell() {
   return shellResponse.text();
 }
 
-async function fetchProperty(propertyId) {
-  const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
-  const publishableKey = process.env.VITE_SUPABASE_PUBLISHABLE_KEY
+function getSupabaseConfigFromBundle(bundle) {
+  const supabaseUrl = bundle.match(/https:\/\/[a-z0-9-]+\.supabase\.co/i)?.[0];
+  const publishableKey = bundle.match(/\bsb_publishable_[A-Za-z0-9_-]+\b/)?.[0]
+    || bundle.match(/\beyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\b/)?.[0];
+  return { supabaseUrl, publishableKey };
+}
+
+async function fetchSupabaseConfig(shellHtml) {
+  let supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
+  let publishableKey = process.env.VITE_SUPABASE_PUBLISHABLE_KEY
     || process.env.SUPABASE_PUBLISHABLE_KEY
     || process.env.VITE_SUPABASE_ANON_KEY
     || process.env.SUPABASE_ANON_KEY;
-  if (!supabaseUrl || !publishableKey) throw new Error('Supabase public environment variables are not configured');
+
+  if (!supabaseUrl || !publishableKey) {
+    const scriptPaths = [...shellHtml.matchAll(/<script\b[^>]*\bsrc=["']([^"']+\.js(?:\?[^"']*)?)["'][^>]*>/gi)]
+      .map((match) => match[1]);
+    const origin = getDeploymentOrigin();
+
+    for (const scriptPath of scriptPaths) {
+      const bundleUrl = new URL(scriptPath, origin);
+      if (bundleUrl.origin !== origin) continue;
+      const bundleResponse = await fetch(bundleUrl, { signal: AbortSignal.timeout(8000) });
+      if (!bundleResponse.ok) continue;
+      const discovered = getSupabaseConfigFromBundle(await bundleResponse.text());
+      supabaseUrl ||= discovered.supabaseUrl;
+      publishableKey ||= discovered.publishableKey;
+      if (supabaseUrl && publishableKey) break;
+    }
+  }
+
+  if (!supabaseUrl || !publishableKey) {
+    throw new Error('Supabase public configuration is unavailable to the share renderer');
+  }
+
+  return { supabaseUrl, publishableKey };
+}
+
+async function fetchProperty(propertyId, shellHtml) {
+  const { supabaseUrl, publishableKey } = await fetchSupabaseConfig(shellHtml);
 
   const url = new URL('/rest/v1/properties', supabaseUrl);
   url.searchParams.set('select', PROPERTY_FIELDS);
@@ -79,7 +112,7 @@ export default async function shareProperty(request, response) {
       return sendHtml(response, 404, renderNotFoundHtml(shellHtml, canonicalUrl));
     }
 
-    const property = await fetchProperty(propertyId);
+    const property = await fetchProperty(propertyId, shellHtml);
     if (!property) return sendHtml(response, 404, renderNotFoundHtml(shellHtml, canonicalUrl));
     return sendHtml(response, 200, renderPropertyHtml(shellHtml, property, canonicalUrl));
   } catch (error) {
