@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { markNewPropertyPhotoUrl } from '@/lib/propertyPhotoWatermark';
 
 const BUCKET_NAME = 'property-images';
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
@@ -61,7 +62,7 @@ export function useImageUpload() {
       setUploadProgress(100);
       toast.success('Imagem enviada com sucesso!');
       
-      return urlData.publicUrl;
+      return markNewPropertyPhotoUrl(urlData.publicUrl);
     } catch (err) {
       console.error('Upload error:', err);
       toast.error('Erro ao enviar imagem. Tente novamente.');
@@ -81,7 +82,7 @@ export function useImageUpload() {
         return false;
       }
 
-      const filePath = urlParts[1];
+      const filePath = urlParts[1].split(/[?#]/, 1)[0];
 
       const { error } = await supabase.storage
         .from(BUCKET_NAME)

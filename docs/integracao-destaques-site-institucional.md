@@ -29,6 +29,14 @@ const supabase = createClient(
 const PROPERTY_PORTAL = 'https://imoveis.icaroimoveis.com.br';
 const WATERMARK_URL = `${PROPERTY_PORTAL}/brand-watermark.png`;
 
+function hasBrandWatermark(imageUrl: string) {
+  try {
+    return new URL(imageUrl).hash === '#icaro-watermark';
+  } catch {
+    return false;
+  }
+}
+
 type HomepagePropertyCard = {
   position: number;
   property_id: string;
@@ -85,7 +93,9 @@ export function FeaturedProperties() {
             {property.images?.[0] && (
               <div className="property-card__image">
                 <img src={property.images[0]} alt={property.title} loading="lazy" />
-                <img src={WATERMARK_URL} className="property-card__watermark" alt="" aria-hidden="true" />
+                {hasBrandWatermark(property.images[0]) && (
+                  <img src={WATERMARK_URL} className="property-card__watermark" alt="" aria-hidden="true" />
+                )}
                 {!property.is_available && <span className="property-card__availability">Indisponível</span>}
               </div>
             )}
@@ -117,7 +127,7 @@ Para manter o mesmo tratamento visual no site institucional, adicione ao CSS do 
 }
 ```
 
-Os imóveis já cadastrados e os novos são considerados disponíveis por padrão. Ao marcar um anúncio como indisponível no painel, `is_available` passa a `false`; o site institucional pode aplicar o estilo acima sem remover o card. A logo é servida pelo portal em `https://imoveis.icaroimoveis.com.br/brand-watermark.png`, centralizada sobre a foto com opacidade de 50%; os arquivos originais das fotos não são alterados.
+Os imóveis já cadastrados e os novos são considerados disponíveis por padrão. Ao marcar um anúncio como indisponível no painel, `is_available` passa a `false`; o site institucional pode aplicar o estilo acima sem remover o card. A logo é servida pelo portal em `https://imoveis.icaroimoveis.com.br/brand-watermark.png` e aparece centralizada, com opacidade de 50%, somente nas URLs que contêm o fragmento `#icaro-watermark`. Esse fragmento é acrescentado às fotos enviadas a partir da publicação desta regra; fotos e anúncios já cadastrados não são regravados nem alterados.
 
 A consulta já devolve as posições em ordem crescente. Ao clicar em um card, o visitante abre o anúncio original no portal de imóveis. É possível adaptar o markup ao framework e ao visual do site institucional sem alterar a consulta.
 
