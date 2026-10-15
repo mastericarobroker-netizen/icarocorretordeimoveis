@@ -27,6 +27,7 @@ const supabase = createClient(
 );
 
 const PROPERTY_PORTAL = 'https://imoveis.icaroimoveis.com.br';
+const WATERMARK_URL = `${PROPERTY_PORTAL}/brand-watermark.png`;
 
 type HomepagePropertyCard = {
   position: number;
@@ -84,6 +85,7 @@ export function FeaturedProperties() {
             {property.images?.[0] && (
               <div className="property-card__image">
                 <img src={property.images[0]} alt={property.title} loading="lazy" />
+                <img src={WATERMARK_URL} className="property-card__watermark" alt="" aria-hidden="true" />
                 {!property.is_available && <span className="property-card__availability">Indisponível</span>}
               </div>
             )}
@@ -102,15 +104,19 @@ Para manter o mesmo tratamento visual no site institucional, adicione ao CSS do 
 
 ```css
 .property-card__image { position: relative; }
-.property-card__image img { display: block; width: 100%; height: 100%; object-fit: cover; }
-.property-card--unavailable .property-card__image img { filter: grayscale(1); }
+.property-card__image > img:first-child { display: block; width: 100%; height: 100%; object-fit: cover; }
+.property-card__image .property-card__watermark {
+  position: absolute; right: 4%; bottom: 4%; z-index: 1; width: 28%; max-width: 240px; max-height: 34%;
+  object-fit: contain; opacity: .85; pointer-events: none; filter: drop-shadow(0 1px 4px rgb(0 0 0 / 95%));
+}
+.property-card--unavailable .property-card__image > img:first-child { filter: grayscale(1); }
 .property-card__availability {
-  position: absolute; inset: auto 0 0; padding: .5rem; text-align: center;
+  position: absolute; inset: auto 0 0; z-index: 2; padding: .5rem; text-align: center;
   color: #fff; background: rgb(0 0 0 / 70%); font-weight: 700;
 }
 ```
 
-Os imóveis já cadastrados e os novos são considerados disponíveis por padrão. Ao marcar um anúncio como indisponível no painel, `is_available` passa a `false`; o site institucional pode aplicar o estilo acima sem remover o card.
+Os imóveis já cadastrados e os novos são considerados disponíveis por padrão. Ao marcar um anúncio como indisponível no painel, `is_available` passa a `false`; o site institucional pode aplicar o estilo acima sem remover o card. A logo é servida pelo portal em `https://imoveis.icaroimoveis.com.br/brand-watermark.png` e deve ser incluída como imagem sobreposta; os arquivos originais das fotos não são alterados.
 
 A consulta já devolve as posições em ordem crescente. Ao clicar em um card, o visitante abre o anúncio original no portal de imóveis. É possível adaptar o markup ao framework e ao visual do site institucional sem alterar a consulta.
 

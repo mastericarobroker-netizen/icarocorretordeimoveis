@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { X, Upload, ImagePlus, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { WatermarkedImage } from '@/components/WatermarkedImage';
 
 interface ImageUploaderProps {
   images: string[];
@@ -89,10 +90,12 @@ export function ImageUploader({
               key={url}
               className="relative group aspect-square rounded-lg overflow-hidden border border-border bg-muted"
             >
-              <img
+              <WatermarkedImage
                 src={url}
                 alt={`Imagem ${index + 1}`}
-                className="w-full h-full object-cover"
+                className="absolute inset-0"
+                imageClassName="object-cover"
+                watermarkClassName="w-[34%]"
               />
               <button
                 type="button"
@@ -108,6 +111,12 @@ export function ImageUploader({
             </div>
           ))}
         </div>
+      )}
+
+      {images.length > 0 && (
+        <p className="text-xs text-muted-foreground">
+          A logo aparece sobre as fotos no site; os arquivos originais permanecem preservados.
+        </p>
       )}
 
       {/* Upload Progress */}
