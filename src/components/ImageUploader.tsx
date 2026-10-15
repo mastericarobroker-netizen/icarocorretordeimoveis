@@ -115,7 +115,7 @@ export function ImageUploader({
 
       {images.length > 0 && (
         <p className="text-xs text-muted-foreground">
-          A logo aparece sobre as fotos no site; os arquivos originais permanecem preservados.
+          A logo será exibida somente nas fotos adicionadas a partir de agora. As fotos já cadastradas e os arquivos originais permanecem sem alteração.
         </p>
       )}
 
