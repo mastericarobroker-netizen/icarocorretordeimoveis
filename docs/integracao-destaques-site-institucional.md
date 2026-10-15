@@ -106,8 +106,9 @@ Para manter o mesmo tratamento visual no site institucional, adicione ao CSS do 
 .property-card__image { position: relative; }
 .property-card__image > img:first-child { display: block; width: 100%; height: 100%; object-fit: cover; }
 .property-card__image .property-card__watermark {
-  position: absolute; right: 4%; bottom: 4%; z-index: 1; width: 28%; max-width: 240px; max-height: 34%;
-  object-fit: contain; opacity: .85; pointer-events: none; filter: drop-shadow(0 1px 4px rgb(0 0 0 / 95%));
+  position: absolute; left: 50%; top: 50%; z-index: 1; width: 28%; max-width: 240px; max-height: 34%;
+  transform: translate(-50%, -50%); object-fit: contain; opacity: .5; pointer-events: none;
+  filter: drop-shadow(0 1px 4px rgb(0 0 0 / 95%));
 }
 .property-card--unavailable .property-card__image > img:first-child { filter: grayscale(1); }
 .property-card__availability {
@@ -116,7 +117,7 @@ Para manter o mesmo tratamento visual no site institucional, adicione ao CSS do 
 }
 ```
 
-Os imóveis já cadastrados e os novos são considerados disponíveis por padrão. Ao marcar um anúncio como indisponível no painel, `is_available` passa a `false`; o site institucional pode aplicar o estilo acima sem remover o card. A logo é servida pelo portal em `https://imoveis.icaroimoveis.com.br/brand-watermark.png` e deve ser incluída como imagem sobreposta; os arquivos originais das fotos não são alterados.
+Os imóveis já cadastrados e os novos são considerados disponíveis por padrão. Ao marcar um anúncio como indisponível no painel, `is_available` passa a `false`; o site institucional pode aplicar o estilo acima sem remover o card. A logo é servida pelo portal em `https://imoveis.icaroimoveis.com.br/brand-watermark.png`, centralizada sobre a foto com opacidade de 50%; os arquivos originais das fotos não são alterados.
 
 A consulta já devolve as posições em ordem crescente. Ao clicar em um card, o visitante abre o anúncio original no portal de imóveis. É possível adaptar o markup ao framework e ao visual do site institucional sem alterar a consulta.
 

@@ -31,7 +31,7 @@ export function WatermarkedImage({
         aria-hidden="true"
         draggable={false}
         className={cn(
-          'pointer-events-none absolute bottom-[4%] right-[4%] z-20 w-[28%] max-h-[34%] max-w-[240px] object-contain opacity-80 drop-shadow-[0_1px_4px_rgba(0,0,0,0.95)]',
+          'pointer-events-none absolute left-1/2 top-1/2 z-20 w-[28%] max-h-[34%] max-w-[240px] -translate-x-1/2 -translate-y-1/2 object-contain opacity-50 drop-shadow-[0_1px_4px_rgba(0,0,0,0.95)]',
           watermarkClassName
         )}
       />
